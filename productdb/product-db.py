@@ -3,7 +3,8 @@
 from socket import * 
 import thread
 
-serverPort = 8886
+SERVERHOST = ''
+SERVERPORT = 8886
 
 #Storage format: ID Quantity Name Category Condition Price Keyword1...
 productdb = []
@@ -20,7 +21,7 @@ def threadrunner(clientsock, addr):
             iid, data = data.split(' ', 1)
             for item in productdb:
                 if item[0] == iid:
-                    retmsg = item[2] + ' ' + item[3] + ' ' + item[0] + ' ' + item[4] + ' ' + item[5] + ' ' + str(item[1])
+                    retmsg = 'GETSUCCESS' + item[2] + ' ' + item[3] + ' ' + item[0] + ' ' + item[4] + ' ' + item[5] + ' ' + str(item[1])
                     for keyword in item[6]:
                         retmsg = retmsg + ' ' + keyword
                     clientsock.send(retmsg)
@@ -35,7 +36,7 @@ def threadrunner(clientsock, addr):
             iquant = int(iquant)
             klist = data.split()
             productdb.append([iid, iquant, iname, icat, icond, iprice, klist])
-            retmsg = 'SUCCESS Item succesfully added to Product DB'
+            retmsg = 'ADDSUCCESS Item succesfully added to Product DB'
             clientsock.send(retmsg)
         elif cmd in ['UPDATE']:
             iid, data = data.split(' ', 1)
@@ -43,7 +44,7 @@ def threadrunner(clientsock, addr):
             for item in productdb:
                 if item[0] == iid:
                     item[5] = newprice
-                    retmsg = 'SUCCESS Item price succesfully updated in Product DB'
+                    retmsg = 'UPDATESUCCESS Item price succesfully updated in Product DB'
                     clientsock.send(retmsg)
                     break
         elif cmd in ['REMOVE']:
@@ -53,10 +54,10 @@ def threadrunner(clientsock, addr):
                 if item[0] == iid:
                     if item[1] > remquant:
                         item[1] = item[1] - remquant
-                        retmsg = 'SUCCESS Item quantity succesfully updated in Product DB'
+                        retmsg = 'REMOVESUCCESS Item quantity succesfully updated in Product DB'
                     else:
                         productdb.remove(item)
-                        retmsg = 'SUCCESS Item succesfully removed from Product DB'
+                        retmsg = 'REMOVESUCCESS Item succesfully removed from Product DB'
                     clientsock.send(retmsg)
                     break
         #elif cmd in ['']:
@@ -65,7 +66,7 @@ def threadrunner(clientsock, addr):
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)
     tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    tcpsocket.bind(('', serverPort))
+    tcpsocket.bind((SERVERHOST, SERVERPORT))
     tcpsocket.listen(5)
 
 while 1:
