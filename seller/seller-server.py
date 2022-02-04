@@ -4,11 +4,9 @@ from socket import *
 import threading
 
 SERVERHOST = ''
-SERVERPORT = 8898
+SERVERPORT = 8887
 
 def threadrunner(clientsock, addr):
-    print(clientsock)
-    print(addr)
 	# while 1:
 	# 	data = clientsock.recv(1024)
 	# 	if not data:
@@ -31,8 +29,6 @@ def threadrunner(clientsock, addr):
             
     #     elif cmd in ['REMOVESUCCESS']:
     print("Server thread running")
-    print(clientsock.recv(1024).decode())
-    clientsock.send('Thank you for connecting'.encode())
 
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)
@@ -42,5 +38,4 @@ if __name__ == '__main__':
 
 while 1:
 	(clientsock, addr) = tcpsocket.accept()
-	threading.Thread(target = threadrunner, args = (clientsock, addr,)).start()
-    
+	thread.start_new_thread(threadrunner, (clientsock, addr))
