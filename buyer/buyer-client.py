@@ -28,32 +28,40 @@ def threadrunner(host_ip, port):
   
   
   s.connect((host_ip, port))
+  print("Buyer client is ready") 
   while 1:
       val = input("Enter your command: ")
-      if val=='exit':
-          s.send('1111')
+      print("cmd "+val)
+      if val== "exit":
+          print("exiting")
+          s.send('1111'.encode())
           break
       if val=='0011':
+          #search item
           keywords = input("Enter your key words with spaced for searching: ")
-          s.send(val+' '+keywords.encode())
+          s.send((val + " "+keywords).encode())
           print("fetching items for sale")
           print (s.recv(1024).decode())#recv has to be a blocking call
       if val=='0100':
+          #Add item
           ItemId_qautity = input("Enter item ID and quatity: ")
-          s.send(val+' '+ItemId_qautity.encode())
+          s.send((val+' '+ItemId_qautity).encode())
           print("Checking whether success !!")
           print (s.recv(1024).decode())#recv has to be a blocking call
       if val=="0101":
+          #remove item
           ItemId_qautity = input("Enter item ID and quatity: ")
-          s.send(val+' '+ItemId_qautity.encode())
+          s.send((val+' '+ItemId_qautity).encode())
           print("Checking whether success !!")
           print (s.recv(1024).decode())#recv has to be a blocking call
       if val=="0110":
+          #clear cart
           ItemId_qautity = input("Clearing Shopping cart: ")
           s.send(val)
           print("Checking whether success !!")
           print (s.recv(1024).decode())#recv has to be a blocking call
       if val=="0111":
+          #display cart
           ItemId_qautity = input("Displaying Shopping cart: ")
           s.send(val)
           print("Fetching !!")
@@ -62,8 +70,8 @@ def threadrunner(host_ip, port):
 
 
 
-print("Buyer client is ready")  
-port = 8898
+ 
+port = 8807
 try:
     host_ip = socket.gethostbyname('127.0.0.1')
 except socket.gaierror:
@@ -72,7 +80,9 @@ except socket.gaierror:
 while 1:
  val = input("Do you want to use buyer-client interface: ")
  if(val=='yes'):   
-  threading.Thread(target = threadrunner, args = (host_ip, port,)).start()
+  #threading.Thread(target = threadrunner, args = (host_ip, port,)).start()
+   threadrunner(host_ip,port)
+   port+=1
  elif val=='exit':
      break
 
