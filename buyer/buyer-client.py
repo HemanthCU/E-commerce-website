@@ -82,7 +82,6 @@ while 1:
  if(val=='yes'):   
   #threading.Thread(target = threadrunner, args = (host_ip, port,)).start()
    threadrunner(host_ip,port)
-   port+=1
  elif val=='exit':
      break
 
