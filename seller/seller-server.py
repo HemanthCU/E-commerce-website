@@ -16,6 +16,11 @@ SERVERPORT = 8807
 # Exit 1111
 
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
+
+unique_item_id = 1
+unique_seller_id = 1
+sellerDB = {}
+
 def threadrunner(clientsock, addr):
     print(clientsock)
     print(addr)
@@ -29,6 +34,21 @@ def threadrunner(clientsock, addr):
             break
         if cmd[0] == '0100':
            #Put an item for sale:
+
+           #preparing seller DB
+           itemId = int(str(unique_seller_id)+str(unique_item_id))
+           if unique_seller_id in sellerDB.keys():
+              list = sellerDB[unique_seller_id]
+              list.append(itemId)
+              sellerDB[unique_seller_id] = itemId
+           else:
+               list = []
+               list.append(itemId)
+               sellerDB[unique_seller_id] = list
+
+           #preparing productDB
+           
+
            
 		   
         if cmd[0]=='0101':
@@ -47,6 +67,7 @@ if __name__ == '__main__':
     tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     tcpsocket.bind(('', SERVERPORT))
     tcpsocket.listen(5)
+
 
 while 1:
 	(clientsock, addr) = tcpsocket.accept()
