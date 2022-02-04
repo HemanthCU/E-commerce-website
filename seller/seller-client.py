@@ -1,3 +1,4 @@
+from ast import keyword
 import socket
 import threading
 import sys
@@ -15,7 +16,7 @@ import sys
 # Get seller rating: provide buyer id CMD 1010
 # Get buyer history CMD 1011
 
-#CMD ARG1 ARG2 ARG3
+#CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 def threadrunner(host_ip, port):
   try:
@@ -26,11 +27,36 @@ def threadrunner(host_ip, port):
   
   
   s.connect((host_ip, port))
-  
-  
-  
-  s.send('Let me connect'.encode())
-  print (s.recv(1024).decode())
+  while 1:
+      val = input("Enter your command: ")
+      if val=='exit':
+          break
+      if val=='0011':
+          keywords = input("Enter your key words with spaced for searching: ")
+          s.send(val+' '+keywords.encode())
+          print("fetching items for sale")
+          print (s.recv(1024).decode())#recv has to be a blocking call
+      if val=='0100':
+          ItemId_qautity = input("Enter item ID and quatity: ")
+          s.send(val+' '+ItemId_qautity.encode())
+          print("Checking whether success !!")
+          print (s.recv(1024).decode())#recv has to be a blocking call
+      if val=="0101":
+          ItemId_qautity = input("Enter item ID and quatity: ")
+          s.send(val+' '+ItemId_qautity.encode())
+          print("Checking whether success !!")
+          print (s.recv(1024).decode())#recv has to be a blocking call
+      if val=="0110":
+          ItemId_qautity = input("Clearing Shopping cart: ")
+          s.send(val)
+          print("Checking whether success !!")
+          print (s.recv(1024).decode())#recv has to be a blocking call
+      if val=="0111":
+          ItemId_qautity = input("Displaying Shopping cart: ")
+          s.send(val)
+          print("Fetching !!")
+          print (s.recv(1024).decode())#recv has to be a blocking call
+
 
 
 
@@ -41,6 +67,12 @@ try:
 except socket.gaierror:
     print ("there was an error resolving the host")
     sys.exit()
-#while 1:
-threading.Thread(target = threadrunner, args = (host_ip, port,)).start()
+while 1:
+ val = input("Do you want to use buyer-client interface: ")
+ if(val=='yes'):   
+  threading.Thread(target = threadrunner, args = (host_ip, port,)).start()
+ elif val=='exit':
+     break
+
+
 
