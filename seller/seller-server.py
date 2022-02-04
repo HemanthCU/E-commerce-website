@@ -4,32 +4,44 @@ from socket import *
 import threading
 
 SERVERHOST = ''
-SERVERPORT = 8887
+SERVERPORT = 8807
+# Create an account: sets up username and password 0000
+# Login: provide username and password 0001
+# Logout 0010
+# Get seller rating 0011 
+# Put an item for sale: provide all item characteristics and quantity 0100
+# Change the sale price of an item: provide item id and new sale price 0101
+# Remove an item from sale: provide item id and quantity 0110
+# Display items currently on sale put up by this seller 0111
+# Exit 1111
 
+#CMD ARG1 ARG2 ARG3 ARG4 ARG5
 def threadrunner(clientsock, addr):
-	# while 1:
-	# 	data = clientsock.recv(1024)
-	# 	if not data:
-    #         break
-	# 	# Code to be written here
-    #     cmd, data = data.split(' ', 1)
-    #     if cmd in ['GET']:
+    print(clientsock)
+    print(addr)
+    while 1:
+        print('Waiting for user command')
+        data = clientsock.recv(1024).decode()
+        print(data)
+        cmd = data.split(' ')
+        print(cmd)
+        if cmd[0]=='1111':
+            break
+        if cmd[0] == '0100':
+           #Put an item for sale:
+           
+		   
+        if cmd[0]=='0101':
+			#Change the sale price of an item
+           
+        if cmd[0]=='0110':
+			#Remove an item from sale
             
-    #     elif cmd in ['ADD']:
-            
-    #     elif cmd in ['UPDATE']:
-            
-    #     elif cmd in ['REMOVE']:
-            
-    #     elif cmd in ['GETSUCCESS']:
-            
-    #     elif cmd in ['ADDSUCCESS']:
-            
-    #     elif cmd in ['UPDATESUCCESS']:
-            
-    #     elif cmd in ['REMOVESUCCESS']:
-    print("Server thread running")
-
+        if cmd[0]=='0111':
+           # Display items currently on sale put up by this seller
+        
+          
+          
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)
     tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -38,4 +50,5 @@ if __name__ == '__main__':
 
 while 1:
 	(clientsock, addr) = tcpsocket.accept()
-	thread.start_new_thread(threadrunner, (clientsock, addr))
+	threading.Thread(target = threadrunner, args = (clientsock, addr,)).start()
+    
