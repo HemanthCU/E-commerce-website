@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from ast import keyword
 from socket import * 
 import threading
 
@@ -9,7 +10,7 @@ SERVERPORT = 8886
 #Storage format: ID Quantity Name Category Condition Price Keyword1...
 
 productdb = {}
-
+keywordDB = {}
 def threadrunner(clientsock, addr):
     print(clientsock)
     print(addr)
@@ -31,6 +32,15 @@ def threadrunner(clientsock, addr):
         elif cmd == 'ADD':
             if iid not in productdb.keys():
               productdb[iid] = data
+              characteristics = data.split(' ')
+              i = 5
+              while i<len(characteristics):
+                  if characteristics[i] in keywordDB.keys():
+                      list = keywordDB[characteristics[i]]
+                      list.append(iid)
+                      keywordDB[characteristics[i]] = list
+                  else:
+                      keywordDB[characteristics[i]] = [iid]
               clientsock.send("ADDSUCCESS".encode()) 
             else:
               clientsock.send("ADDFAILURE  - already exsisting item".encode())    

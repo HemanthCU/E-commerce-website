@@ -2,6 +2,7 @@
 
 from socket import * 
 import threading
+import sys
 
 SERVERHOST = ''
 SERVERPORT = 8807
@@ -24,11 +25,26 @@ sellerDB = {}
 def threadrunner(clientsock, addr):
     print(clientsock)
     print(addr)
+    
+    #product DB connection
+    productDB_port = 8886
+    try:
+     productDB_ip = socket.gethostbyname('127.0.0.1')
+    except socket.gaierror:
+     print ("there was an error resolving the host")
+     sys.exit()
+    try:
+     productDB_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     print ("Socket is successfully created")
+    except socket.error as err:
+     print ("Socket creation is failed with error %s" %(err))
+    productDB_socket.connect((productDB_ip, productDB_port))
+
     while 1:
         print('Waiting for user command')
         data = clientsock.recv(1024).decode()
         print(data)
-        cmd = data.split(' ')
+        cmd,arg = data.split(' ',1)
         print(cmd)
         if cmd[0]=='1111':
             break
@@ -46,11 +62,9 @@ def threadrunner(clientsock, addr):
                list.append(itemId)
                sellerDB[unique_seller_id] = list
 
-           #preparing productDB
-           
-
-           
-		   
+           #preparing productDB 
+           productDB_socket.send(arg.encode())
+           print(productDB_socket.recv(1024).decode())
         if cmd[0]=='0101':
 			#Change the sale price of an item
            
