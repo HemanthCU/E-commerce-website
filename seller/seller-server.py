@@ -17,9 +17,9 @@ SERVERPORT = 8807
 # Exit 1111
 
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
-
+seller_id = 1
 unique_item_id = 1
-unique_seller_id = 1
+
 sellerDB = {}
 
 def threadrunner(clientsock, addr):
@@ -52,15 +52,15 @@ def threadrunner(clientsock, addr):
            #Put an item for sale:
 
            #preparing seller DB
-           itemId = int(str(unique_seller_id)+str(unique_item_id))
-           if unique_seller_id in sellerDB.keys():
-              list = sellerDB[unique_seller_id]
+           itemId = int(str(seller_id)+str(unique_item_id))
+           if seller_id in sellerDB.keys():
+              list = sellerDB[seller_id]
               list.append(itemId)
-              sellerDB[unique_seller_id] = list
+              sellerDB[seller_id] = list
            else:
-              sellerDB[unique_seller_id] = [itemId]
-           unique_seller_id += 1
-           
+              sellerDB[seller_id] = [itemId]
+           seller_id += 1
+
            #preparing productDB 
            productDB_socket.send(('ADD '+arg).encode())
            clientsock.send(productDB_socket.recv(1024))
