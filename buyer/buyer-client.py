@@ -25,8 +25,15 @@ def threadrunner(host_ip, port):
     except socket.error as err:
         print ("Socket creation is failed with error %s" %(err))
     s.connect((host_ip, port))
-    print("Buyer client is ready") 
+    print("Buyer client is ready")
     while 1:
+        print("MENU")
+        print("0011 - Search based on keywords")
+        print("0100 - Add item to cart")
+        print("0101 - Remove item from cart")
+        print("0111 - Display cart")
+        print("0110 - Clear cart")
+        print("exit - Close the program")
         val = input("Enter your command: ")
         print("cmd "+val)
         if val== "exit":
