@@ -28,7 +28,13 @@ def threadrunner(clientsock, addr):
                 clientsock.send(productdb(iid).encode())
             else:
                 clientsock.send("GETFAILURE  -  item does not exist".encode())     
-               
+
+        if cmd == 'GETIIDS':
+            if data in keywordDB.keys():
+                clientsock.send(keywordDB(data).encode())
+            else:
+                clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
+
         elif cmd == 'ADD':
             if iid not in productdb.keys():
               productdb[iid] = data
