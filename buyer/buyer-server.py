@@ -4,6 +4,7 @@ from socket import *
 import threading
 import sys
 from unicodedata import category
+import socket
 
 SERVERHOST = ''
 SERVERPORT = 8808

@@ -73,7 +73,7 @@ except socket.gaierror:
     sys.exit()
 while 1:
     val = input("Do you want to use buyer-client interface: ")
-    if val=='yes':
+    if val=='yes':   
         threadrunner(host_ip,port)
     elif val=='exit':
         break

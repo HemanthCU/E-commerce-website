@@ -17,7 +17,7 @@ def threadrunner(clientsock, addr):
     while 1:
         data = clientsock.recv(1024).decode()
         if data == 'CLOSE':
-           break
+            break
         #Input format: CMD   Name, Category ID,  Condition, Price, Quantity,  Keyword1...
         cmd, data = data.split(' ', 1)
         #List of commands: GET(based on ID) ADD UPDATE REMOVE
