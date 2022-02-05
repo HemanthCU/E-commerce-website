@@ -56,24 +56,33 @@ def threadrunner(clientsock, addr):
            if unique_seller_id in sellerDB.keys():
               list = sellerDB[unique_seller_id]
               list.append(itemId)
-              sellerDB[unique_seller_id] = itemId
+              sellerDB[unique_seller_id] = list
            else:
-               list = []
-               list.append(itemId)
-               sellerDB[unique_seller_id] = list
+              sellerDB[unique_seller_id] = [itemId]
 
            #preparing productDB 
-           productDB_socket.send(arg.encode())
-           print(productDB_socket.recv(1024).decode())
+           productDB_socket.send(('ADD '+arg).encode())
+           clientsock.send(productDB_socket.recv(1024))
         if cmd[0]=='0101':
 			#Change the sale price of an item
-           
+            productDB_socket.send(('UPDATE '+arg).encode())
+            clientsock.send(productDB_socket.recv(1024))
         if cmd[0]=='0110':
 			#Remove an item from sale
+            productDB_socket.send(('REMOVE '+arg).encode())
+            clientsock.send(productDB_socket.recv(1024))
+            
             
         if cmd[0]=='0111':
            # Display items currently on sale put up by this seller
-        
+           itemList = sellerDB[arg]
+           resultItemList = ''
+           for iid in itemList:
+              productDB_socket.send(('GET '+iid).encode())
+              resultItemList += productDB_socket.recv(1024).decode()
+           clientsock.send(resultItemList.encode())
+
+           
           
           
 if __name__ == '__main__':
