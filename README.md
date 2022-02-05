@@ -10,5 +10,5 @@ Our system has the following components and they perform the functions as follow
 All servers and the Product DB are multithreaded and can handle multiple requests at the same time.
 
 The response times for the actions are as follows:
-1) Seller operations: 
-2) Buyer operations: 
+1) Seller operations: Avg time is around 3.931 ms local loopback and 24.357 ms for machines connected over LAN
+2) Buyer operations: Avg time is around 3.781 ms local loopback and 23.715 ms for machines connected over LAN
