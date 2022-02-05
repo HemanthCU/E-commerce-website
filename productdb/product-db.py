@@ -36,20 +36,22 @@ def threadrunner(clientsock, addr):
                 clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
 
         elif cmd == 'ADD':
+            iid, data = data.split(' ', 1)
             if iid not in productdb.keys():
-              productdb[iid] = data
-              characteristics = data.split(' ')
-              i = 5
-              while i<len(characteristics):
-                  if characteristics[i] in keywordDB.keys():
-                      list = keywordDB[characteristics[i]]
-                      list.append(iid)
-                      keywordDB[characteristics[i]] = list
-                  else:
-                      keywordDB[characteristics[i]] = [iid]
-              clientsock.send("ADDSUCCESS".encode()) 
+                productdb[iid] = data
+                characteristics = data.split(' ')
+                i = 5
+                while i<len(characteristics):
+                    if characteristics[i] in keywordDB.keys():
+                        list1 = keywordDB[characteristics[i]]
+                        list1.append(iid)
+                        keywordDB[characteristics[i]] = list1
+                    else:
+                        keywordDB[characteristics[i]] = [iid]
+                    i = i + 1
+                clientsock.send("ADDSUCCESS".encode()) 
             else:
-              clientsock.send("ADDFAILURE  - already exsisting item".encode())    
+                clientsock.send("ADDFAILURE  - already exsisting item".encode())    
             
         elif cmd == 'UPDATE':
             iid, data = data.split(' ', 1)
@@ -80,6 +82,7 @@ def threadrunner(clientsock, addr):
                 clientsock.send("REMOVE FAILURE  -  item does not exist".encode()) 
         #elif cmd in ['']:
         #TODO: Search based on keywords
+        
 
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)

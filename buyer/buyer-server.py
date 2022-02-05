@@ -6,7 +6,7 @@ import sys
 from unicodedata import category
 
 SERVERHOST = ''
-SERVERPORT = 8807
+SERVERPORT = 8808
 # Create an account: sets up username and password CMD 0000
 # Login: provide username and password CMD 0001
 # Logout CMD 0010
@@ -26,15 +26,15 @@ def threadrunner(clientsock, addr):
     #product DB connection
     productDB_port = 8886
     try:
-     productDB_ip = socket.gethostbyname('127.0.0.1')
+        productDB_ip = socket.gethostbyname('127.0.0.1')
     except socket.gaierror:
-     print ("there was an error resolving the host")
-     sys.exit()
+        print ("there was an error resolving the host")
+        sys.exit()
     try:
-     productDB_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-     print ("Socket is successfully created")
+        productDB_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print ("Socket is successfully created")
     except socket.error as err:
-     print ("Socket creation is failed with error %s" %(err))
+        print ("Socket creation is failed with error %s" %(err))
     productDB_socket.connect((productDB_ip, productDB_port))
 
     shoppingCart = {}
@@ -47,44 +47,44 @@ def threadrunner(clientsock, addr):
         if cmd=='1111':
             break
         if cmd == '0011':
-           #search items for sale
-           index = 1
-           keywords = data.split(' ')
-           catagory = keywords[0]
-           finalItems = ''
-           while(index<len(keywords)):
-              productDB_socket.send(("GETIIDS "+keywords[index]).encode())
-              itemIDList = productDB_socket.recv(1024).decode()
-              for itemID in itemIDList:
-                 productDB_socket.send(("GET "+itemID).encode())
-                 itemDetails = productDB_socket.recv(1024).decode()
-                 itemDetailstTuple = itemDetails.split(' ')
-                 if itemDetailstTuple[1]==category and int(itemDetailstTuple[4])>0:
-                    finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+'\n'
-              index += 1
-			  #fetch details from productDB
-           clientsock.send(finalItems.encode())
-		   
+            #search items for sale
+            index = 1
+            keywords = data.split(' ')
+            catagory = keywords[0]
+            finalItems = ''
+            while(index<len(keywords)):
+                productDB_socket.send(("GETIIDS "+keywords[index]).encode())
+                itemIDList = productDB_socket.recv(1024).decode()
+                for itemID in itemIDList:
+                    productDB_socket.send(("GET "+itemID).encode())
+                    itemDetails = productDB_socket.recv(1024).decode()
+                    itemDetailstTuple = itemDetails.split(' ')
+                    if itemDetailstTuple[1]==category and int(itemDetailstTuple[4])>0:
+                        finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+'\n'
+                index += 1
+            clientsock.send(finalItems.encode())
         if cmd[0]=='0100':
 			#add item to shopping cart
-           if cmd[1] in shoppingCart.keys():
-              shoppingCart[cmd[1]] = int(cmd[2])
-           else:
-              shoppingCart[cmd[1]] += int(cmd[2])
-           clientsock.send("Successfully done ".encode())
+            if cmd[1] in shoppingCart.keys():
+                shoppingCart[cmd[1]] = int(cmd[2])
+            else:
+                shoppingCart[cmd[1]] += int(cmd[2])
+            clientsock.send("Successfully done ".encode())
         if cmd[0]=='0111':
 			#Display shopping cart
             currentCart = ''
             for key in shoppingCart.keys():
-               if shoppingCart[key]>0:
-                  currentCart = currentCart +" item id : " +str(key)+", quantity: "+str(shoppingCart[key])+"\n"
+                if shoppingCart[key]>0:
+                    currentCart = currentCart +" item id : " +str(key)+", quantity: "+str(shoppingCart[key])+"\n"
             clientsock.send(currentCart.encode())
         if cmd[0]=='0101':
            # remove an item from cart
             if cmd[1] in shoppingCart.keys():
-              shoppingCart[cmd[1]] -= int(cmd[2])
-              clientsock.send("Successfully done ".encode()) 
-        if cmd[0]=="0110":
+                shoppingCart[cmd[1]] -= int(cmd[2])
+                clientsock.send("Successfully done ".encode())
+            else:
+                clientsock.send("Item doesn't exist ".encode())
+        if cmd[0]=='0110':
 			#clear the cart
             shoppingCart.clear()
             clientsock.send("Successfully done ".encode())

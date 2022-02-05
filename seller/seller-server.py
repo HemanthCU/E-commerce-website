@@ -27,17 +27,13 @@ def threadrunner(clientsock, addr):
     print(addr)
     
     #product DB connection
+    productDB_ip =  ''
     productDB_port = 8886
     try:
-     productDB_ip = socket.gethostbyname('127.0.0.1')
-    except socket.gaierror:
-     print ("there was an error resolving the host")
-     sys.exit()
-    try:
-     productDB_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-     print ("Socket is successfully created")
-    except socket.error as err:
-     print ("Socket creation is failed with error %s" %(err))
+        productDB_socket = socket(AF_INET, SOCK_STREAM)
+        print ("Socket is successfully created")
+    except error as err:
+        print ("Socket creation is failed with error %s" %(err))
     productDB_socket.connect((productDB_ip, productDB_port))
 
     while 1:
@@ -52,17 +48,17 @@ def threadrunner(clientsock, addr):
            #Put an item for sale:
 
            #preparing seller DB
-           itemId = int(str(unique_seller_id)+str(unique_item_id))
-           if unique_seller_id in sellerDB.keys():
-              list = sellerDB[unique_seller_id]
-              list.append(itemId)
-              sellerDB[unique_seller_id] = list
-           else:
-              sellerDB[unique_seller_id] = [itemId]
+            itemId = int(str(unique_seller_id)+str(unique_item_id))
+            if unique_seller_id in sellerDB.keys():
+                list1 = sellerDB[unique_seller_id]
+                list1.append(itemId)
+                sellerDB[unique_seller_id] = list1
+            else:
+                sellerDB[unique_seller_id] = [itemId]
 
            #preparing productDB 
-           productDB_socket.send(('ADD '+arg).encode())
-           clientsock.send(productDB_socket.recv(1024))
+            productDB_socket.send(('ADD '+arg).encode())
+            clientsock.send(productDB_socket.recv(1024))
         if cmd=='0101':
 			#Change the sale price of an item
             productDB_socket.send(('UPDATE '+arg).encode())
@@ -75,16 +71,13 @@ def threadrunner(clientsock, addr):
             
         if cmd=='0111':
            # Display items currently on sale put up by this seller
-           itemList = sellerDB[arg]
-           resultItemList = ''
-           for iid in itemList:
-              productDB_socket.send(('GET '+iid).encode())
-              resultItemList += productDB_socket.recv(1024).decode()+'\n'
-           clientsock.send(resultItemList.encode())
+            itemList = sellerDB[arg]
+            resultItemList = ''
+            for iid in itemList:
+                productDB_socket.send(('GET '+iid).encode())
+                resultItemList += productDB_socket.recv(1024).decode()+'\n'
+            clientsock.send(resultItemList.encode())
 
-           
-          
-          
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)
     tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
