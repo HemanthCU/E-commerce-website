@@ -8,6 +8,7 @@ Our system has the following components and they perform the functions as follow
 5) Buyer Client - UI for the buyer to perform the necessary functions
 
 All servers and the Product DB are multithreaded and can handle multiple requests at the same time.
+However, buffer is not persistent for all the servers and product DB
 
 The response times for the actions are as follows:
 1) Seller operations: Avg time is around 3.931 ms local loopback and 24.357 ms for machines connected over LAN
