@@ -8,5 +8,5 @@ Our system has the following components and they perform the functions as follow
 5) Buyer Client - UI for the buyer to perform the necessary functions
 
 The response times for the actions are as follows:
-Seller operations: 
-Buyer operations: 
+1) Seller operations: 
+2) Buyer operations: 
