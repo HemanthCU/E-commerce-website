@@ -40,19 +40,21 @@ def threadrunner(host_ip, port):
         if val=='0101':
             #Change the sale price of an item
             ItemId_price = input("Enter item ID and new sale price: ")
-            s.send((val+' '+ItemId_qautity).encode())
+            s.send((val+' '+ItemId_price).encode())
             print("Checking whether success !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0110":
             #Remove an item from sale
-            ItemId_qautity = input("Enter item ID and quatity: ")
-            s.send((val+' '+ItemId_qautity).encode())
+            ItemId_quantity = input("Enter item ID and quantity: ")
+            s.send((val+' '+ItemId_quantity).encode())
             print("Checking whether success !!")
-            print (s.recv(1024).decode())#recv has to be a blocking call
+            data = s.recv(1024).decode()
+            if not data.split(' ', 1) == 'GETFAILURE':
+                print (data)#recv has to be a blocking call
         if val=="0111":
             #Display items currently on sale put up by this seller
             seller_id = input("Enter seller id: ")
-            s.send((val+" "+seller_id).emcode())
+            s.send((val+" "+seller_id).encode())
             print("Checking whether success !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
 

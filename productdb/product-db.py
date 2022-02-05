@@ -12,6 +12,8 @@ SERVERPORT = 8886
 productdb = {}
 keywordDB = {}
 def threadrunner(clientsock, addr):
+    global productdb
+    global keywordDB
     print(clientsock)
     print(addr)
     while 1:
@@ -23,15 +25,15 @@ def threadrunner(clientsock, addr):
         #List of commands: GET(based on ID) ADD UPDATE REMOVE
         
         if cmd == 'GET':
-            iid, data = data.split(' ', 1)
+            iid = data
             if iid in productdb.keys():
-                clientsock.send(productdb(iid).encode())
+                clientsock.send((iid + ' ' + productdb[iid]).encode())
             else:
                 clientsock.send("GETFAILURE  -  item does not exist".encode())     
 
         if cmd == 'GETIIDS':
             if data in keywordDB.keys():
-                clientsock.send(keywordDB(data).encode())
+                clientsock.send(keywordDB[data].encode())
             else:
                 clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
 
@@ -72,16 +74,29 @@ def threadrunner(clientsock, addr):
             remquant = int(data)
             if iid in productdb.keys():
                 itemDetails = productdb[iid].split(' ')
-                itemDetails[4] = str(int(itemDetails[4]) - remquant)
-                newDetails = ''
-                for details in itemDetails:
-                    newDetails += details+' '
-                productdb[iid] = newDetails
+                newQuant = int(itemDetails[4]) - remquant
+                if newQuant<=0:
+                    newQuant=0
+                    poppeddata = productdb.pop(iid)
+                    characteristics = poppeddata.split(' ')
+                    i = 5
+                    while i<len(characteristics):
+                        if characteristics[i] in keywordDB.keys():
+                            list1 = keywordDB[characteristics[i]]
+                            list1.remove(iid)
+                            keywordDB[characteristics[i]] = list1
+                        i = i + 1
+                else:
+                    itemDetails[4] = str(int(itemDetails[4]) - remquant)
+                    newDetails = ''
+                    for details in itemDetails:
+                        newDetails += details+' '
+                    productdb[iid] = newDetails
                 clientsock.send("REMOVE SUCCESS ".encode()) 
             else:
-                clientsock.send("REMOVE FAILURE  -  item does not exist".encode()) 
-        #elif cmd in ['']:
-        #TODO: Search based on keywords
+                clientsock.send("REMOVEFAILURE  -  item does not exist".encode()) 
+        print(productdb)
+        print(keywordDB)
         
 
 if __name__ == '__main__':

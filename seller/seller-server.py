@@ -23,6 +23,9 @@ unique_seller_id = 1
 sellerDB = {}
 
 def threadrunner(clientsock, addr):
+    global unique_item_id
+    global unique_seller_id
+    global sellerDB
     print(clientsock)
     print(addr)
     
@@ -44,39 +47,42 @@ def threadrunner(clientsock, addr):
         print(cmd)
         if cmd=='1111':
             break
-        if cmd == '0100':
-           #Put an item for sale:
+        elif cmd == '0100':
+            #Put an item for sale:
 
-           #preparing seller DB
-            itemId = int(str(unique_seller_id)+str(unique_item_id))
-            if unique_seller_id in sellerDB.keys():
-                list1 = sellerDB[unique_seller_id]
+            #preparing seller DB
+            itemId = str(unique_seller_id)+str(unique_item_id)
+            if str(unique_seller_id) in sellerDB.keys():
+                list1 = sellerDB[str(unique_seller_id)]
                 list1.append(itemId)
-                sellerDB[unique_seller_id] = list1
+                sellerDB[str(unique_seller_id)] = list1
             else:
-                sellerDB[unique_seller_id] = [itemId]
+                sellerDB[str(unique_seller_id)] = [itemId]
+            #unique_seller_id = unique_seller_id + 1
+            unique_item_id = unique_item_id + 1
 
            #preparing productDB 
-            productDB_socket.send(('ADD '+arg).encode())
+            productDB_socket.send(('ADD '+itemId+' '+arg).encode())
             clientsock.send(productDB_socket.recv(1024))
-        if cmd=='0101':
+        elif cmd=='0101':
 			#Change the sale price of an item
             productDB_socket.send(('UPDATE '+arg).encode())
             clientsock.send(productDB_socket.recv(1024))
-        if cmd=='0110':
+        elif cmd=='0110':
 			#Remove an item from sale
             productDB_socket.send(('REMOVE '+arg).encode())
             clientsock.send(productDB_socket.recv(1024))
-            
-            
-        if cmd=='0111':
+        elif cmd=='0111':
            # Display items currently on sale put up by this seller
             itemList = sellerDB[arg]
             resultItemList = ''
             for iid in itemList:
                 productDB_socket.send(('GET '+iid).encode())
-                resultItemList += productDB_socket.recv(1024).decode()+'\n'
+                res = productDB_socket.recv(1024).decode()
+                if not res.split(' ')[0] in ['GETFAILURE']:
+                    resultItemList += res +'\n'
             clientsock.send(resultItemList.encode())
+        print(sellerDB)
 
 if __name__ == '__main__':
     tcpsocket = socket(AF_INET, SOCK_STREAM)
