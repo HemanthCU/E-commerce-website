@@ -1,5 +1,9 @@
 # Distributed Systems Programming Assignments - E-commerce Website
 
+Names:
+Soumyadeb Maity
+Hemanth Chenna
+
 Our system has the following components and they perform the functions as follows:
 1) Product DB - Maintains the details of all the items in an in-memory DB
 2) Seller Server - Maintains the list of sellers and the corresponding items those sellers are selling. Acts as the intermediate between the seller and the DB
