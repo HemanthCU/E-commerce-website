@@ -24,6 +24,12 @@ def threadrunner(host_ip, port):
     s.connect((host_ip, port))
     print("Seller client is ready") 
     while 1:
+        print("MENU")
+        print("0100 - Put an item for sale")
+        print("0101 - Change the sale price of an item")
+        print("0111 - Display items currently on sale put up by this seller")
+        print("0110 - Remove an item from sale")
+        print("exit - Close the program")
         val = input("Enter your command: ")
         print("cmd "+val)
         if val== "exit":
