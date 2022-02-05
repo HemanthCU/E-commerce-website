@@ -4,7 +4,6 @@ from socket import *
 import threading
 import sys
 from unicodedata import category
-import socket
 
 SERVERHOST = ''
 SERVERPORT = 8808
@@ -27,14 +26,14 @@ def threadrunner(clientsock, addr):
     #product DB connection
     productDB_port = 8886
     try:
-        productDB_ip = socket.gethostbyname('127.0.0.1')
-    except socket.gaierror:
+        productDB_ip = ''
+    except gaierror:
         print ("there was an error resolving the host")
         sys.exit()
     try:
-        productDB_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        productDB_socket = socket(AF_INET, SOCK_STREAM)
         print ("Socket is successfully created")
-    except socket.error as err:
+    except error as err:
         print ("Socket creation is failed with error %s" %(err))
     productDB_socket.connect((productDB_ip, productDB_port))
 
@@ -56,36 +55,46 @@ def threadrunner(clientsock, addr):
             while(index<len(keywords)):
                 productDB_socket.send(("GETIIDS "+keywords[index]).encode())
                 itemIDList = productDB_socket.recv(1024).decode()
-                for itemID in itemIDList:
+                print(itemIDList)
+                itemList = itemIDList.split(' ')
+                for itemID in itemList:
                     productDB_socket.send(("GET "+itemID).encode())
                     itemDetails = productDB_socket.recv(1024).decode()
-                    itemDetailstTuple = itemDetails.split(' ')
-                    if itemDetailstTuple[1]==category and int(itemDetailstTuple[4])>0:
-                        finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+'\n'
+                    if not itemDetails.split(' ')[0] in ['GETFAILURE']:
+                        print(itemDetails)
+                        itemDetailstTuple = itemDetails.split(' ')
+                        if itemDetailstTuple[2] in [catagory] and int(itemDetailstTuple[5])>0:
+                            finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[1]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+' '+itemDetailstTuple[4]+' '+itemDetailstTuple[5]+'\n'
                 index += 1
             clientsock.send(finalItems.encode())
-        if cmd[0]=='0100':
+        if cmd=='0100':
 			#add item to shopping cart
-            if cmd[1] in shoppingCart.keys():
-                shoppingCart[cmd[1]] = int(cmd[2])
+            itemDetails = data.split(' ')
+            if itemDetails[0] in shoppingCart.keys():
+                shoppingCart[itemDetails[0]] = str(int(shoppingCart[itemDetails[0]]) + int(itemDetails[1]))
             else:
-                shoppingCart[cmd[1]] += int(cmd[2])
+                shoppingCart[itemDetails[0]] = itemDetails[1]
             clientsock.send("Successfully done ".encode())
-        if cmd[0]=='0111':
+        if cmd=='0111':
 			#Display shopping cart
             currentCart = ''
             for key in shoppingCart.keys():
-                if shoppingCart[key]>0:
+                if int(shoppingCart[key])>0:
                     currentCart = currentCart +" item id : " +str(key)+", quantity: "+str(shoppingCart[key])+"\n"
+            if currentCart == '':
+                currentCart = 'CART EMPTY'
             clientsock.send(currentCart.encode())
-        if cmd[0]=='0101':
+        if cmd=='0101':
            # remove an item from cart
-            if cmd[1] in shoppingCart.keys():
-                shoppingCart[cmd[1]] -= int(cmd[2])
+            itemDetails = data.split(' ')
+            if itemDetails[0] in shoppingCart.keys():
+                shoppingCart[itemDetails[0]] = str(int(shoppingCart[itemDetails[0]]) - int(itemDetails[1]))
+                if int(shoppingCart[itemDetails[0]])<=0:
+                    shoppingCart.pop(itemDetails[0])
                 clientsock.send("Successfully done ".encode())
             else:
                 clientsock.send("Item doesn't exist ".encode())
-        if cmd[0]=='0110':
+        if cmd=='0110':
 			#clear the cart
             shoppingCart.clear()
             clientsock.send("Successfully done ".encode())

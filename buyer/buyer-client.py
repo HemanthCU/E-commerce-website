@@ -1,4 +1,3 @@
-from ast import keyword
 import socket
 import threading
 import sys
@@ -42,30 +41,28 @@ def threadrunner(host_ip, port):
             print (s.recv(1024).decode())#recv has to be a blocking call
         if val=='0100':
             #Add item
-            ItemId_qautity = input("Enter item ID and quatity: ")
+            ItemId_qautity = input("Enter item ID and quantity: ")
             s.send((val+' '+ItemId_qautity).encode())
             print("Checking whether success !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0101":
             #remove item
-            ItemId_qautity = input("Enter item ID and quatity: ")
+            ItemId_qautity = input("Enter item ID and quantity: ")
             s.send((val+' '+ItemId_qautity).encode())
             print("Checking whether success !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0110":
             #clear cart
-            ItemId_qautity = input("Clearing Shopping cart: ")
-            s.send(val)
+            s.send((val + ' dummy').encode())
             print("Checking whether success !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0111":
             #display cart
-            ItemId_qautity = input("Displaying Shopping cart: ")
-            s.send(val)
+            s.send((val + ' dummy').encode())
             print("Fetching !!")
             print (s.recv(1024).decode())#recv has to be a blocking call
 
-port = 8807
+port = 8808
 try:
     host_ip = socket.gethostbyname('127.0.0.1')
 except socket.gaierror:

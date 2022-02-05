@@ -33,7 +33,11 @@ def threadrunner(clientsock, addr):
 
         if cmd == 'GETIIDS':
             if data in keywordDB.keys():
-                clientsock.send(keywordDB[data].encode())
+                retstr = ''
+                for item in keywordDB[data]:
+                    retstr = retstr + str(item) + ' '
+                print(retstr)
+                clientsock.send(retstr.encode())
             else:
                 clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
 
