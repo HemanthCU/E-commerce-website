@@ -59,7 +59,8 @@ def threadrunner(clientsock, addr):
               sellerDB[unique_seller_id] = list
            else:
               sellerDB[unique_seller_id] = [itemId]
-
+           unique_seller_id += 1
+           
            #preparing productDB 
            productDB_socket.send(('ADD '+arg).encode())
            clientsock.send(productDB_socket.recv(1024))

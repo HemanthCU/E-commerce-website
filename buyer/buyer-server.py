@@ -4,6 +4,7 @@ from socket import *
 import threading
 import sys
 from unicodedata import category
+import socket
 
 SERVERHOST = ''
 SERVERPORT = 8807
@@ -62,7 +63,6 @@ def threadrunner(clientsock, addr):
                  if itemDetailstTuple[1]==category and int(itemDetailstTuple[4])>0:
                     finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+'\n'
               index += 1
-			  #fetch details from productDB
            clientsock.send(finalItems.encode())
 		   
         if cmd[0]=='0100':
