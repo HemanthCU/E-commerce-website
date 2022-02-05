@@ -1,6 +1,6 @@
 # Distributed Systems Programming Assignments - E-commerce Website
 
-Names:
+Group Member Names:
 1) Soumyadeb Maity
 2) Hemanth Chenna
 
