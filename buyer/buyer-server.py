@@ -70,11 +70,16 @@ def threadrunner(clientsock, addr):
         if cmd=='0100':
 			#add item to shopping cart
             itemDetails = data.split(' ')
-            if itemDetails[0] in shoppingCart.keys():
+            productDB_socket.send(("GET "+itemDetails[0]).encode())
+            itemDBDetails = productDB_socket.recv(1024).decode()
+            if itemDBDetails.split(' ')[0] in ['GETFAILURE']:
+                clientsock.send("Item is not available currently".encode())
+            else:    
+             if itemDetails[0] in shoppingCart.keys():
                 shoppingCart[itemDetails[0]] = str(int(shoppingCart[itemDetails[0]]) + int(itemDetails[1]))
-            else:
+             else:
                 shoppingCart[itemDetails[0]] = itemDetails[1]
-            clientsock.send("Successfully done ".encode())
+             clientsock.send("Successfully done ".encode())
         if cmd=='0111':
 			#Display shopping cart
             currentCart = ''
@@ -98,6 +103,8 @@ def threadrunner(clientsock, addr):
 			#clear the cart
             shoppingCart.clear()
             clientsock.send("Successfully done ".encode())
+        print("shopping cart")
+        print(shoppingCart)
           
           
 if __name__ == '__main__':

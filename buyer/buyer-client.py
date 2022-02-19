@@ -42,7 +42,7 @@ def threadrunner(host_ip, port):
             break
         if val=='0011':
             #search item
-            keywords = input("Enter your key words with spaced for searching: ")
+            keywords = input("Enter your item category and keywords with spaced for searching: ")
             s.send((val + " "+keywords).encode())
             print("fetching items for sale")
             print (s.recv(1024).decode())#recv has to be a blocking call
