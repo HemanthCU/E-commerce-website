@@ -1,23 +1,28 @@
 #!/usr/bin/env python
-
+from concurrent import futures
 from ast import keyword
 from socket import * 
 import threading
+import grpc
+import sys
+sys.path.append('../')
+import backend_pb2
+import backend_pb2_grpc
 
-SERVERHOST = ''
-SERVERPORT = 8886
+#SERVERHOST = ''
+#SERVERPORT = 8886
 
 #Storage format: ID Quantity Name Category Condition Price Keyword1...
 
 productdb = {}
 keywordDB = {}
-def threadrunner(clientsock, addr):
+def threadrunner(data):
     global productdb
     global keywordDB
-    print(clientsock)
-    print(addr)
+    #print(clientsock)
+    #print(addr)
     while 1:
-        data = clientsock.recv(1024).decode()
+        #data = clientsock.recv(1024).decode()
         if data == 'CLOSE':
             break
         #Input format: CMD   Name, Category ID,  Condition, Price, Quantity,  Keyword1...
@@ -27,9 +32,11 @@ def threadrunner(clientsock, addr):
         if cmd == 'GET':
             iid = data
             if iid in productdb.keys():
-                clientsock.send((iid + ' ' + productdb[iid]).encode())
+                return backend_pb2.outputMsg(output=(iid + ' ' + productdb[iid]))
+                #clientsock.send((iid + ' ' + productdb[iid]).encode())
             else:
-                clientsock.send("GETFAILURE  -  item does not exist".encode())     
+                return backend_pb2.outputMsg(output="GETFAILURE  -  item does not exist")
+                #clientsock.send("GETFAILURE  -  item does not exist".encode())     
 
         if cmd == 'GETIIDS':
             if data in keywordDB.keys():
@@ -37,9 +44,11 @@ def threadrunner(clientsock, addr):
                 for item in keywordDB[data]:
                     retstr = retstr + str(item) + ' '
                 print(retstr)
-                clientsock.send(retstr.encode())
+                return backend_pb2.outputMsg(output=retstr)
+                #clientsock.send(retstr.encode())
             else:
-                clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
+                return backend_pb2.outputMsg(output="GETIIDS FAILURE  -  item does not exist")
+                #clientsock.send("GETIIDS FAILURE  -  item does not exist".encode())     
 
         elif cmd == 'ADD':
             iid, data = data.split(' ', 1)
@@ -55,9 +64,11 @@ def threadrunner(clientsock, addr):
                     else:
                         keywordDB[characteristics[i]] = [iid]
                     i = i + 1
-                clientsock.send("ADDSUCCESS".encode()) 
+                return backend_pb2.outputMsg(output="ADDSUCCESS")    
+                #clientsock.send("ADDSUCCESS".encode()) 
             else:
-                clientsock.send("ADDFAILURE  - already exsisting item".encode())    
+                return backend_pb2.outputMsg(output="ADDFAILURE  - already exsisting item")
+                #clientsock.send("ADDFAILURE  - already exsisting item".encode())    
             
         elif cmd == 'UPDATE':
             iid, data = data.split(' ', 1)
@@ -69,9 +80,11 @@ def threadrunner(clientsock, addr):
                 for details in itemDetails:
                     newDetails += details+' '
                 productdb[iid] = newDetails
-                clientsock.send("UPDATE SUCCESS ".encode()) 
+                return backend_pb2.outputMsg(output="UPDATE SUCCESS ")
+                #clientsock.send("UPDATE SUCCESS ".encode()) 
             else:
-                clientsock.send("UPDATE FAILURE  -  item does not exist".encode())      
+                return backend_pb2.outputMsg(output="UPDATE FAILURE  -  item does not exist")
+                #clientsock.send("UPDATE FAILURE  -  item does not exist".encode())      
     
         elif cmd in ['REMOVE']:
             iid, data = data.split(' ', 1)
@@ -96,19 +109,31 @@ def threadrunner(clientsock, addr):
                     for details in itemDetails:
                         newDetails += details+' '
                     productdb[iid] = newDetails
-                clientsock.send("REMOVE SUCCESS ".encode()) 
+                return backend_pb2.outputMsg(output="REMOVE SUCCESS ")
+                #clientsock.send("REMOVE SUCCESS ".encode()) 
             else:
-                clientsock.send("REMOVEFAILURE  -  item does not exist".encode()) 
+                return backend_pb2.outputMsg(output="REMOVEFAILURE  -  item does not exist")
+                #clientsock.send("REMOVEFAILURE  -  item does not exist".encode()) 
         print(productdb)
         print(keywordDB)
         
 
-if __name__ == '__main__':
-    tcpsocket = socket(AF_INET, SOCK_STREAM)
-    tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    tcpsocket.bind((SERVERHOST, SERVERPORT))
-    tcpsocket.listen(5)
 
-while 1:
-	(clientsock, addr) = tcpsocket.accept()
-	threading.Thread(target = threadrunner, args = (clientsock, addr,)).start()
+class backendApi(backend_pb2_grpc.backendApiServicer):
+
+    def sendProductDB(self, request, context):
+        print(request.input)
+        return threadrunner(request.input)
+        #return backend_pb2.outputMsg(output="Successfully received command")
+
+if __name__ == '__main__':
+    #tcpsocket = socket(AF_INET, SOCK_STREAM)
+    #tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    #tcpsocket.bind((SERVERHOST, SERVERPORT))
+    #tcpsocket.listen(5)
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    backend_pb2_grpc.add_backendApiServicer_to_server(backend_pb2_grpc.backendApi(),server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    server.wait_for_termination()
+
