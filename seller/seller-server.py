@@ -59,6 +59,8 @@ def put():
     
     #Send to productDB ('ADD '+itemId+' '+json_data).encode()
     #productDB_socket.send(('ADD '+itemId+' '+json_data).encode())
+    str = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
     
     response = {
         'result': 'Successfully Added'
