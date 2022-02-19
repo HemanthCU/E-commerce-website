@@ -35,8 +35,8 @@ unique_item_id = 1
 unique_seller_id = 1
 sellerDB = {}
 
-str = '127.0.0.1'+':50051'
-channel = grpc.insecure_channel(str)
+host = '127.0.0.1'+':50051'
+channel = grpc.insecure_channel(host)
 stub = backend_pb2_grpc.backendApiStub(channel)
 
 @app.route('/api/put', methods=['POST'])
@@ -59,8 +59,8 @@ def put():
     
     #Send to productDB ('ADD '+itemId+' '+json_data).encode()
     #productDB_socket.send(('ADD '+itemId+' '+json_data).encode())
-    str = 'string to send to product DB'
-    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
+    inputstr = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
         'result': 'Successfully Added'
@@ -78,8 +78,8 @@ def change():
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    str = 'string to send to product DB'
-    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
+    inputstr = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
         'result': 'Successfully Changed'
@@ -95,8 +95,8 @@ def display():
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    str = 'string to send to product DB'
-    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
+    inputstr = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     dbResponse = 'dummy' #Response from DB
     response = {
         'result': dbResponse
@@ -112,8 +112,8 @@ def remove():
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    str = 'string to send to product DB'
-    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
+    inputstr = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
         'result': 'Successfully Removed'
@@ -211,4 +211,4 @@ def threadrunner(clientsock, addr):
 
     
 # start flask app
-app.run(host="0.0.0.0", port=5000)
+app.run(host="0.0.0.0", port=8807)
