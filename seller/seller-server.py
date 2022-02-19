@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 
-from socket import * 
+from flask import Flask, request, Response
+import jsonpickle
+from PIL import Image
+import base64
+import io
 import threading
 import sys
+from socket import * 
+
+# Initialize the Flask application
+app = Flask(__name__)
+
 
 SERVERHOST = ''
 SERVERPORT = 8807
@@ -22,6 +31,90 @@ unique_item_id = 1
 unique_seller_id = 1
 sellerDB = {}
 
+@app.route('/api/put', methods=['POST'])
+def put():
+    global unique_item_id
+    global unique_seller_id
+    global sellerDB
+    r = request
+    json_data = r.get_json()
+    itemId = str(unique_seller_id)+str(unique_item_id)
+    if str(unique_seller_id) in sellerDB.keys():
+        list1 = sellerDB[str(unique_seller_id)]
+        list1.append(itemId)
+        sellerDB[str(unique_seller_id)] = list1
+    else:
+        sellerDB[str(unique_seller_id)] = [itemId]
+    #unique_seller_id = unique_seller_id + 1
+    unique_item_id = unique_item_id + 1
+    
+    #Send to productDB ('ADD '+itemId+' '+json_data).encode()
+    #productDB_socket.send(('ADD '+itemId+' '+json_data).encode())
+    
+    response = {
+        'result': 'Successfully Added'
+    }
+    # encode response using jsonpickle
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+    
+    
+
+@app.route('/api/change', methods=['POST'])
+def change():
+    r = request
+    json_data = r.get_json()
+    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
+    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    
+    response = {
+        'result': 'Successfully Changed'
+    }
+    # encode response using jsonpickle
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
+@app.route('/api/display', methods=['POST'])
+def display():
+    r = request
+    json_data = r.get_json()
+    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
+    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    dbResponse = 'dummy' #Response from DB
+    response = {
+        'result': dbResponse
+    }
+    # encode response using jsonpickle
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
+@app.route('/api/remove', methods=['POST'])
+def remove():
+    r = request
+    json_data = r.get_json()
+    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
+    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    
+    response = {
+        'result': 'Successfully Removed'
+    }
+    # encode response using jsonpickle
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+    
+@app.route('/api/close', methods=['POST'])
+def close():
+    r = request
+    json_data = r.get_json()
+    
+    response = {
+        'result': 'Successfully exited'
+    }
+    # encode response using jsonpickle
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+    
+    
 def threadrunner(clientsock, addr):
     global unique_item_id
     global unique_seller_id
@@ -84,14 +177,17 @@ def threadrunner(clientsock, addr):
             clientsock.send(resultItemList.encode())
         print(sellerDB)
 
-if __name__ == '__main__':
-    tcpsocket = socket(AF_INET, SOCK_STREAM)
-    tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    tcpsocket.bind(('', SERVERPORT))
-    tcpsocket.listen(5)
+#if __name__ == '__main__':
+#    tcpsocket = socket(AF_INET, SOCK_STREAM)
+#    tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+#    tcpsocket.bind(('', SERVERPORT))
+#    tcpsocket.listen(5)
 
 
-while 1:
-	(clientsock, addr) = tcpsocket.accept()
-	threading.Thread(target = threadrunner, args = (clientsock, addr,)).start()
+#while 1:
+#	(clientsock, addr) = tcpsocket.accept()
+#	threading.Thread(target = threadrunner, args = (clientsock, addr,)).start()
+
     
+# start flask app
+app.run(host="0.0.0.0", port=5000)
