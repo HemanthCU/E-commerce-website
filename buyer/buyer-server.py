@@ -4,7 +4,15 @@ from socket import *
 import threading
 import sys
 from unicodedata import category
+import grpc
+import sys
+sys.path.append('../')
+import backend_pb2
+import backend_pb2_grpc
 
+str = '127.0.0.1'+':50052'
+channel = grpc.insecure_channel(str)
+stub = backend_pb2_grpc.backendApiStub(channel)
 SERVERHOST = ''
 SERVERPORT = 8808
 # Create an account: sets up username and password CMD 0000
@@ -21,6 +29,7 @@ SERVERPORT = 8808
 # Get buyer history CMD 1011
 # Exit 1111
 def threadrunner(clientsock, addr):
+    global stub
     print(clientsock)
     print(addr)
     #product DB connection
@@ -53,8 +62,10 @@ def threadrunner(clientsock, addr):
             catagory = keywords[0]
             finalItems = ''
             while(index<len(keywords)):
-                productDB_socket.send(("GETIIDS "+keywords[index]).encode())
-                itemIDList = productDB_socket.recv(1024).decode()
+                #productDB_socket.send(("GETIIDS "+keywords[index]).encode())
+                #itemIDList = productDB_socket.recv(1024).decode()
+                responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GETIIDS "+keywords[index]))
+                itemIDList = responseFromDB
                 print(itemIDList)
                 itemList = itemIDList.split(' ')
                 for itemID in itemList:
@@ -70,8 +81,10 @@ def threadrunner(clientsock, addr):
         if cmd=='0100':
 			#add item to shopping cart
             itemDetails = data.split(' ')
-            productDB_socket.send(("GET "+itemDetails[0]).encode())
-            itemDBDetails = productDB_socket.recv(1024).decode()
+            #productDB_socket.send(("GET "+itemDetails[0]).encode())
+            #itemDBDetails = productDB_socket.recv(1024).decode()
+            responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemDetails[0]))
+            itemDBDetails = responseFromDB
             if itemDBDetails.split(' ')[0] in ['GETFAILURE']:
                 clientsock.send("Item is not available currently".encode())
             else:    
