@@ -1,0 +1,13 @@
+// The greeting service definition.
+//python3 -m grpc_tools.protoc -I./ --python_out=. --grpc_python_out=. ./backend.proto
+syntax = "proto3";
+service backendApi {
+    rpc sendProductDB (inputMsg) returns (outputMsg) {}
+   }
+  
+message outputMsg {
+    optional string input = 1;
+}
+message inputMsg {
+    optional string output=2;
+}
