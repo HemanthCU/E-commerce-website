@@ -4,10 +4,11 @@ syntax = "proto3";
 service backendApi {
     rpc sendProductDB (inputMsg) returns (outputMsg) {}
    }
-  
-message outputMsg {
-    optional string input = 1;
-}
+ 
 message inputMsg {
-    optional string output=2;
+    optional string input=1;
+}   
+message outputMsg {
+    optional string output = 2;
 }
+

@@ -8,7 +8,11 @@ import io
 import threading
 import sys
 from socket import * 
-
+import grpc
+import sys
+sys.path.append('../')
+import backend_pb2
+import backend_pb2_grpc
 # Initialize the Flask application
 app = Flask(__name__)
 
@@ -31,11 +35,16 @@ unique_item_id = 1
 unique_seller_id = 1
 sellerDB = {}
 
+str = '127.0.0.1'+':50051'
+channel = grpc.insecure_channel(str)
+stub = backend_pb2_grpc.backendApiStub(channel)
+
 @app.route('/api/put', methods=['POST'])
 def put():
     global unique_item_id
     global unique_seller_id
     global sellerDB
+    global stub
     r = request
     json_data = r.get_json()
     itemId = str(unique_seller_id)+str(unique_item_id)
@@ -63,9 +72,12 @@ def put():
 @app.route('/api/change', methods=['POST'])
 def change():
     r = request
+    global stub
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    str = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
     
     response = {
         'result': 'Successfully Changed'
@@ -77,9 +89,12 @@ def change():
 @app.route('/api/display', methods=['POST'])
 def display():
     r = request
+    global stub
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    str = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
     dbResponse = 'dummy' #Response from DB
     response = {
         'result': dbResponse
@@ -91,9 +106,12 @@ def display():
 @app.route('/api/remove', methods=['POST'])
 def remove():
     r = request
+    global stub
     json_data = r.get_json()
     #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
     #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
+    str = 'string to send to product DB'
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = str))
     
     response = {
         'result': 'Successfully Removed'
@@ -105,6 +123,7 @@ def remove():
 @app.route('/api/close', methods=['POST'])
 def close():
     r = request
+    global stub
     json_data = r.get_json()
     
     response = {

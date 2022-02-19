@@ -19,22 +19,22 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rbackend.proto\")\n\toutputMsg\x12\x12\n\x05input\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_input\"*\n\x08inputMsg\x12\x13\n\x06output\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_output26\n\nbackendApi\x12(\n\rsendProductDB\x12\t.inputMsg\x1a\n.outputMsg\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\rbackend.proto\"(\n\x08inputMsg\x12\x12\n\x05input\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_input\"+\n\toutputMsg\x12\x13\n\x06output\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\t\n\x07_output26\n\nbackendApi\x12(\n\rsendProductDB\x12\t.inputMsg\x1a\n.outputMsg\"\x00\x62\x06proto3'
 )
 
 
 
 
-_OUTPUTMSG = _descriptor.Descriptor(
-  name='outputMsg',
-  full_name='outputMsg',
+_INPUTMSG = _descriptor.Descriptor(
+  name='inputMsg',
+  full_name='inputMsg',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='outputMsg.input', index=0,
+      name='input', full_name='inputMsg.input', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -52,26 +52,26 @@ _OUTPUTMSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='_input', full_name='outputMsg._input',
+      name='_input', full_name='inputMsg._input',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
   serialized_start=17,
-  serialized_end=58,
+  serialized_end=57,
 )
 
 
-_INPUTMSG = _descriptor.Descriptor(
-  name='inputMsg',
-  full_name='inputMsg',
+_OUTPUTMSG = _descriptor.Descriptor(
+  name='outputMsg',
+  full_name='outputMsg',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='output', full_name='inputMsg.output', index=0,
+      name='output', full_name='outputMsg.output', index=0,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -89,31 +89,24 @@ _INPUTMSG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='_output', full_name='inputMsg._output',
+      name='_output', full_name='outputMsg._output',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=60,
+  serialized_start=59,
   serialized_end=102,
 )
 
-_OUTPUTMSG.oneofs_by_name['_input'].fields.append(
-  _OUTPUTMSG.fields_by_name['input'])
-_OUTPUTMSG.fields_by_name['input'].containing_oneof = _OUTPUTMSG.oneofs_by_name['_input']
-_INPUTMSG.oneofs_by_name['_output'].fields.append(
-  _INPUTMSG.fields_by_name['output'])
-_INPUTMSG.fields_by_name['output'].containing_oneof = _INPUTMSG.oneofs_by_name['_output']
-DESCRIPTOR.message_types_by_name['outputMsg'] = _OUTPUTMSG
+_INPUTMSG.oneofs_by_name['_input'].fields.append(
+  _INPUTMSG.fields_by_name['input'])
+_INPUTMSG.fields_by_name['input'].containing_oneof = _INPUTMSG.oneofs_by_name['_input']
+_OUTPUTMSG.oneofs_by_name['_output'].fields.append(
+  _OUTPUTMSG.fields_by_name['output'])
+_OUTPUTMSG.fields_by_name['output'].containing_oneof = _OUTPUTMSG.oneofs_by_name['_output']
 DESCRIPTOR.message_types_by_name['inputMsg'] = _INPUTMSG
+DESCRIPTOR.message_types_by_name['outputMsg'] = _OUTPUTMSG
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-outputMsg = _reflection.GeneratedProtocolMessageType('outputMsg', (_message.Message,), {
-  'DESCRIPTOR' : _OUTPUTMSG,
-  '__module__' : 'backend_pb2'
-  # @@protoc_insertion_point(class_scope:outputMsg)
-  })
-_sym_db.RegisterMessage(outputMsg)
 
 inputMsg = _reflection.GeneratedProtocolMessageType('inputMsg', (_message.Message,), {
   'DESCRIPTOR' : _INPUTMSG,
@@ -121,6 +114,13 @@ inputMsg = _reflection.GeneratedProtocolMessageType('inputMsg', (_message.Messag
   # @@protoc_insertion_point(class_scope:inputMsg)
   })
 _sym_db.RegisterMessage(inputMsg)
+
+outputMsg = _reflection.GeneratedProtocolMessageType('outputMsg', (_message.Message,), {
+  'DESCRIPTOR' : _OUTPUTMSG,
+  '__module__' : 'backend_pb2'
+  # @@protoc_insertion_point(class_scope:outputMsg)
+  })
+_sym_db.RegisterMessage(outputMsg)
 
 
 
