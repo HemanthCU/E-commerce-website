@@ -41,6 +41,62 @@ host1 = 'localhost:50054'
 channel = grpc.insecure_channel(host1)
 stub = backend_pb2_grpc.backendApiStub(channel)
 
+@app.route('/api/createAccount', methods=['POST'])
+def createAccount():
+    r = request
+    global stub
+    json_data = r.get_json()
+    #inputstr = 'UPDATE ' + json_data['inputstr']
+    #responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
+    # Code me
+    response = {
+        'result': responseFromDB.output
+    }
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
+@app.route('/api/logIn', methods=['POST'])
+def logIn():
+    r = request
+    global stub
+    json_data = r.get_json()
+    #inputstr = 'UPDATE ' + json_data['inputstr']
+    #responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
+    # Code me
+    response = {
+        'result': responseFromDB.output
+    }
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
+@app.route('/api/logOut', methods=['POST'])
+def logOut():
+    r = request
+    global stub
+    json_data = r.get_json()
+    #inputstr = 'UPDATE ' + json_data['inputstr']
+    #responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
+    # Code me
+    response = {
+        'result': responseFromDB.output
+    }
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
+@app.route('/api/getSellerRating', methods=['POST'])
+def getSellerRating():
+    r = request
+    global stub
+    json_data = r.get_json()
+    #inputstr = 'UPDATE ' + json_data['inputstr']
+    #responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
+    # Code me
+    response = {
+        'result': responseFromDB.output
+    }
+    response_pickled = jsonpickle.encode(response)
+    return Response(response=response_pickled, status=200, mimetype="application/json")
+
 # Put an item for sale: provide all item characteristics and quantity 0100
 @app.route('/api/addItem', methods=['POST'])
 def put():
