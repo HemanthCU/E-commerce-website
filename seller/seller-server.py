@@ -35,11 +35,12 @@ unique_item_id = 1
 unique_seller_id = 1
 sellerDB = {}
 
-host = '127.0.0.1'+':50051'
+host = 'localhost'+':50051'
 channel = grpc.insecure_channel(host)
 stub = backend_pb2_grpc.backendApiStub(channel)
 
-@app.route('/api/put', methods=['POST'])
+# Put an item for sale: provide all item characteristics and quantity 0100
+@app.route('/api/addItem', methods=['POST'])
 def put():
     global unique_item_id
     global unique_seller_id
@@ -54,69 +55,67 @@ def put():
         sellerDB[str(unique_seller_id)] = list1
     else:
         sellerDB[str(unique_seller_id)] = [itemId]
-    #unique_seller_id = unique_seller_id + 1
+    #unique_seller_id = unique_seller_id + 1 // To code
     unique_item_id = unique_item_id + 1
-    
-    #Send to productDB ('ADD '+itemId+' '+json_data).encode()
-    #productDB_socket.send(('ADD '+itemId+' '+json_data).encode())
-    inputstr = 'string to send to product DB'
+    inputstr = 'ADD '+itemId+' '+json_data['inputstr']
+    print(inputstr)
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
-        'result': 'Successfully Added'
+        'result': responseFromDB
     }
-    # encode response using jsonpickle
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
     
     
-
-@app.route('/api/change', methods=['POST'])
+# Change the sale price of an item: provide item id and new sale price 0101
+@app.route('/api/changeSalesPrice', methods=['POST'])
 def change():
     r = request
     global stub
     json_data = r.get_json()
-    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
-    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    inputstr = 'string to send to product DB'
+    inputstr = 'UPDATE ' + json_data['inputstr']
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
-        'result': 'Successfully Changed'
+        'result': responseFromDB
     }
-    # encode response using jsonpickle
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
+
 
 @app.route('/api/display', methods=['POST'])
 def display():
     r = request
     global stub
     json_data = r.get_json()
-    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
-    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    inputstr = 'string to send to product DB'
-    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
-    dbResponse = 'dummy' #Response from DB
+    arg = json_data['inputstr']
+    itemList = sellerDB[arg]
+    resultItemList = ''
+    for iid in itemList:
+        responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = 'GET '+iid))
+        res = responseFromDB
+        if not res.split(' ')[0] in ['GETFAILURE']:
+            resultItemList += res +'\n'
+
     response = {
-        'result': dbResponse
+        'result': resultItemList
     }
     # encode response using jsonpickle
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
 
-@app.route('/api/remove', methods=['POST'])
+# Remove an item from sale: provide item id and quantity 0110
+@app.route('/api/removeItem', methods=['POST'])
 def remove():
     r = request
     global stub
     json_data = r.get_json()
-    #Send to productDB ('UPDATE '+itemId+' '+json_data).encode()
-    #productDB_socket.send(('UPDATE '+itemId+' '+json_data).encode())
-    inputstr = 'string to send to product DB'
+    inputstr = 'REMOVE ' + json_data['inputstr']
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
-        'result': 'Successfully Removed'
+        'result': responseFromDB
     }
     # encode response using jsonpickle
     response_pickled = jsonpickle.encode(response)
