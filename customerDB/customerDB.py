@@ -21,9 +21,9 @@ def threadrunner(data):
         
 
 
-class backendApi(customer_pb2_grpc.backendApiServicer):
+class customerApi(customer_pb2_grpc.customerApiServicer):
 
-    def sendProductDB(self, request, context):
+    def sendCustomerDB(self, request, context):
         print(request.input)
         return threadrunner(request.input)
         #return customer_pb2.outputMsg(output="return to servers")
