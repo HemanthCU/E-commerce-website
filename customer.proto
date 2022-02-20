@@ -1,0 +1,12 @@
+//python3 -m grpc_tools.protoc -I./ --python_out=. --grpc_python_out=. ./customer.proto
+syntax = "proto3";
+service customerApi {
+    rpc sendCustomerDB (inputMsg) returns (outputMsg) {}
+   }
+ 
+message inputMsg {
+    optional string input=1;
+}   
+message outputMsg {
+    optional string output = 2;
+}
