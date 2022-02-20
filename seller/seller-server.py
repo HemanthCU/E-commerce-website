@@ -9,6 +9,8 @@ import threading
 import sys
 from socket import * 
 import grpc
+import requests
+import json
 import sys
 sys.path.append('../')
 import backend_pb2
@@ -60,9 +62,9 @@ def put():
     inputstr = 'ADD '+itemId+' '+json_data['inputstr']
     print(inputstr)
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
-    
+    print(responseFromDB.output)
     response = {
-        'result': responseFromDB
+        'result': responseFromDB.output
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
@@ -78,7 +80,7 @@ def change():
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
-        'result': responseFromDB
+        'result': responseFromDB.output
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
@@ -94,7 +96,8 @@ def display():
     resultItemList = ''
     for iid in itemList:
         responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = 'GET '+iid))
-        res = responseFromDB
+        res = responseFromDB.output
+        print(res)
         if not res.split(' ')[0] in ['GETFAILURE']:
             resultItemList += res +'\n'
 
@@ -115,7 +118,7 @@ def remove():
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
     
     response = {
-        'result': responseFromDB
+        'result': responseFromDB.output
     }
     # encode response using jsonpickle
     response_pickled = jsonpickle.encode(response)

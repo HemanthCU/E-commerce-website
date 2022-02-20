@@ -10,6 +10,8 @@ import time
 import base64
 import jsonpickle
 import random
+import requests
+import json
 
 # Create an account: sets up username and password 0000
 # Login: provide username and password 0001
@@ -50,6 +52,8 @@ def threadrunner(addr):
             
             #s.send((val + " "+keywords).encode())
             print("Checking whether success")
+            #dict_data = json.loads(response.get_json())
+            print(json.loads(response.text)['result'])
             print(response)
             #print (s.recv(1024).decode())#recv has to be a blocking call
         if val=='0101':
@@ -63,7 +67,9 @@ def threadrunner(addr):
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             #s.send((val+' '+ItemId_price).encode())
             print("Checking whether success !!")
+            print(json.loads(response.text)['result'])
             print(response)
+            
             #print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0110":
             headers = {'content-type': 'application/json'}
@@ -74,7 +80,9 @@ def threadrunner(addr):
                 'inputstr' : ItemId_quantity
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print(json.loads(response.text)['result'])
             print(response)
+            
         if val=="0111":
             headers = {'content-type': 'application/json'}
             url = addr + "/api/display"
@@ -86,7 +94,9 @@ def threadrunner(addr):
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             #s.send((val+" "+seller_id).encode())
             print("Checking whether success !!")
+            print(json.loads(response.text)['result'])
             print(response)
+            
 
 port = 8807
 host = '127.0.0.1'
