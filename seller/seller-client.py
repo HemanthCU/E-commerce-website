@@ -28,6 +28,10 @@ import json
 def threadrunner(addr):
     while 1:
         print("MENU")
+        print("0000 - Create an account: sets up username and password")
+        print("0001 - Login: provide username and password")
+        print("0010 - Logout")
+        print("0011 - Get seller rating")
         print("0100 - Put an item for sale")
         print("0101 - Change the sale price of an item")
         print("0111 - Display items currently on sale put up by this seller")
@@ -39,6 +43,44 @@ def threadrunner(addr):
             print("exiting")
             #s.send('1111'.encode())
             break
+        if val == '0000':
+            inputstr = input(" enter username and password to Create Account")
+            values = {
+                'inputstr' : inputstr
+            }
+            url = addr + "/api/createAccount"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success")
+            print(json.loads(response.text)['result'])
+            print(response)
+        if val == '0001':
+            inputstr = input(" enter username and password to Log in")
+            values = {
+                'inputstr' : inputstr
+            }
+            url = addr + "/api/logIn"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success")
+            print(json.loads(response.text)['result'])
+            print(response)
+        if val == '0010':
+            url = addr + "/api/logOut"
+            values = {
+                'inputstr' : 'logOut'
+            }
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success")
+            print(json.loads(response.text)['result'])
+            print(response)
+        if val == '0011':
+            url = addr + "/api/getSellerRating"
+            values = {
+                'inputstr' : 'getSellerRating'
+            }
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success")
+            print(json.loads(response.text)['result'])
+            print(response)
         if val=='0100':
             headers = {'content-type': 'application/json'}
             url = addr + "/api/addItem"
