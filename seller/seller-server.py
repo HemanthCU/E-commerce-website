@@ -35,8 +35,8 @@ unique_item_id = 1
 unique_seller_id = 1
 sellerDB = {}
 
-host = 'localhost'+':50051'
-channel = grpc.insecure_channel(host)
+host1 = 'localhost:50054'
+channel = grpc.insecure_channel(host1)
 stub = backend_pb2_grpc.backendApiStub(channel)
 
 # Put an item for sale: provide all item characteristics and quantity 0100

@@ -132,8 +132,8 @@ if __name__ == '__main__':
     #tcpsocket.bind((SERVERHOST, SERVERPORT))
     #tcpsocket.listen(5)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    backend_pb2_grpc.add_backendApiServicer_to_server(backend_pb2_grpc.backendApi(),server)
-    server.add_insecure_port('[::]:50051')
+    backend_pb2_grpc.add_backendApiServicer_to_server(backendApi(),server)
+    server.add_insecure_port('[::]:50054')
     server.start()
     server.wait_for_termination()
 
