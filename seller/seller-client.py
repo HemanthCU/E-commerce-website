@@ -92,12 +92,10 @@ def threadrunner(addr):
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             
-            #s.send((val + " "+keywords).encode())
             print("Checking whether success")
             #dict_data = json.loads(response.get_json())
             print(json.loads(response.text)['result'])
             print(response)
-            #print (s.recv(1024).decode())#recv has to be a blocking call
         if val=='0101':
             headers = {'content-type': 'application/json'}
             url = addr + "/api/changeSalesPrice"
@@ -107,12 +105,9 @@ def threadrunner(addr):
                 'inputstr' : ItemId_price
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            #s.send((val+' '+ItemId_price).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-            
-            #print (s.recv(1024).decode())#recv has to be a blocking call
         if val=="0110":
             headers = {'content-type': 'application/json'}
             url = addr + "/api/removeItem"
@@ -134,7 +129,6 @@ def threadrunner(addr):
                 'inputstr' : seller_id
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            #s.send((val+" "+seller_id).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
