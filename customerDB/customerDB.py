@@ -113,15 +113,9 @@ def threadrunner(data):
             return customer_pb2.outputMsg(output="No buyer with username: "+userName)  
        count = buyerHistory[userName]
        return customer_pb2.outputMsg(output="Purchase history : "+count)
-
-
-
-
-
-
-
     
-    return customer_pb2.outputMsg(output="return to servers")
+    return customer_pb2.outputMsg(output="No proper cmd found")
+
                
 class customerApi(customer_pb2_grpc.customerApiServicer):
 
