@@ -200,7 +200,12 @@ def threadrunner(addr):
         else:
             print("Enter a valid option")
 port = 8808
-host = '127.0.0.1'
+if len(sys.argv) < 1:
+    print('please give ip of buyer-server')
+
+ip1 = sys.argv[1]
+host = ip1
+#host = '127.0.0.1'
 
 addr = f"http://{host}:8808"
 

@@ -20,12 +20,16 @@ import customer_pb2_grpc
 # Initialize the Flask application
 app = Flask(__name__)
 
+if len(sys.argv) < 2:
+    print('please give ip of 2 db')
 
-host1 = 'localhost:50054'
+ip1 = sys.argv[1]
+ip2 = sys.argv[2]
+host1 = ip2 + ':50054'
 channel = grpc.insecure_channel(host1)
 stub = backend_pb2_grpc.backendApiStub(channel)
 
-host2 = 'localhost:50055'
+host2 = ip2 + ':50055'
 channel1 = grpc.insecure_channel(host2)
 stub1 = customer_pb2_grpc.customerApiStub(channel1)
 
