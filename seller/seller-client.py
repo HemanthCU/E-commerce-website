@@ -46,7 +46,7 @@ def threadrunner(addr):
             break
         elif val == '0000':
             headers = {'content-type': 'application/json'}
-            inputstr = input("enter username and password to Create Account \n")
+            inputstr = input("Enter username and password to Create Account \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -57,7 +57,7 @@ def threadrunner(addr):
             print(response)
         elif val == '0001':
             headers = {'content-type': 'application/json'}
-            inputstr = input(" enter username and password to Log in \n")
+            inputstr = input("Enter username and password to Log in \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -70,7 +70,7 @@ def threadrunner(addr):
         elif val == '0010' and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/logOut"
-            inputstr = input(" enter username  to Log out \n")
+            inputstr = input("Enter username to Log out \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -82,7 +82,7 @@ def threadrunner(addr):
         elif val == '0011' and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/getSellerRating"
-            inputstr = input(" enter username  to get seller rating \n")
+            inputstr = input("Enter username to get seller rating \n")
             values = {
                 'inputstr' : inputstr
             }
