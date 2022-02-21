@@ -48,7 +48,7 @@ def searchItems():
         itemList = itemIDList.split(' ')
         for itemID in itemList:
             itemDetails = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemID))
-            if not itemDetails.split(' ')[0] in ['GETFAILURE']:
+            if not itemDetails.output.split(' ')[0] in ['GETFAILURE']:
                 print(itemDetails)
                 itemDetailstTuple = itemDetails.split(' ')
                 if itemDetailstTuple[2] in [category] and int(itemDetailstTuple[5])>0:
