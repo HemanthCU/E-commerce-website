@@ -26,6 +26,7 @@ import json
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 def threadrunner(addr):
+    loggedIn = false
     while 1:
         print("MENU")
         print("0000 - Create an account: sets up username and password")
@@ -53,7 +54,7 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        if val == '0001':
+        elif val == '0001':
             inputstr = input(" enter username and password to Log in")
             values = {
                 'inputstr' : inputstr
@@ -63,7 +64,8 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        if val == '0010':
+            loggedIn = true
+        elif val == '0010' and loggedIn == true:
             url = addr + "/api/logOut"
             values = {
                 'inputstr' : 'logOut'
@@ -72,7 +74,8 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        if val == '0011':
+            loggedIn = false
+        elif val == '0011' and loggedIn == true:
             url = addr + "/api/getSellerRating"
             values = {
                 'inputstr' : 'getSellerRating'
@@ -81,7 +84,7 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        if val=='0100':
+        elif val=='0100' and loggedIn == true:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/addItem"
             #Put an item for sale
@@ -96,7 +99,7 @@ def threadrunner(addr):
             #dict_data = json.loads(response.get_json())
             print(json.loads(response.text)['result'])
             print(response)
-        if val=='0101':
+        elif val=='0101' and loggedIn == true:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/changeSalesPrice"
             #Change the sale price of an item
@@ -108,7 +111,7 @@ def threadrunner(addr):
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-        if val=="0110":
+        elif val=="0110" and loggedIn == true:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/removeItem"
             #Remove an item from sale
@@ -120,7 +123,7 @@ def threadrunner(addr):
             print(json.loads(response.text)['result'])
             print(response)
             
-        if val=="0111":
+        elif val=="0111" and loggedIn == true:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/display"
             #Display items currently on sale put up by this seller
@@ -132,7 +135,10 @@ def threadrunner(addr):
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-            
+        elif loggedIn==false:
+            print("Please log in and try again")
+        else:
+            print("Please enter a valid option")
 
 port = 8807
 host = '127.0.0.1'
