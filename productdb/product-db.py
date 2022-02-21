@@ -55,9 +55,9 @@ def threadrunner(data):
 
         elif cmd == 'ADD':
             iid, data = data.split(' ', 1)
-            sid = iid.split(' ')[0]
+            sellerUserName, data = data.split(' ', 1)
             if iid not in productdb.keys():
-                itemsellerDB[iid] = sid
+                itemsellerDB[iid] = sellerUserName
                 productdb[iid] = data
                 characteristics = data.split(' ')
                 i = 5
@@ -124,7 +124,7 @@ def threadrunner(data):
         elif cmd in ['GETSID']:
             if data in itemsellerDB.keys():
                 retstr = itemsellerDB[data]
-                return backend_pb2.outputMsg(output=retstr + ' dummy')
+                return backend_pb2.outputMsg(output=retstr)
                 #clientsock.send(retstr.encode())
             else:
                 return backend_pb2.outputMsg(output="GETSIDFAILURE  -  seller does not exist")

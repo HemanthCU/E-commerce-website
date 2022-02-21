@@ -85,9 +85,11 @@ def login():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
+    global loggedInBuyerList
     r = request
+    json_data = r.get_json()
     inputCmd = json_data['inputstr']
-    if inputCmd in loggedInSellerList.keys():
+    if inputCmd in loggedInBuyerList.keys():
         loggedInBuyerList[inputCmd] = 0
     response = {
         'result': 'logged out'
@@ -247,11 +249,11 @@ def provideFeedback():
     #Format of inputstr: itemid1 feedback1
     itemid, inputstr = inputstr.split(' ',1)
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GETSID "+itemid))
-    sid = responseFromDB.output
-    if sid.split(' ')[0] in ['GETSIDFAILURE']:
+    sellerUserName = responseFromDB.output
+    if sellerUserName in ['GETSIDFAILURE']:
         respstr = "Seller does not exist"
     else:
-        inputCmd = 'UPDATE_SELLER_REVIEW ' + sid.split(' ')[0] + ' ' + inputstr
+        inputCmd = 'UPDATE_SELLER_REVIEW ' + sellerUserName + ' ' + inputstr
         responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
         respstr = responseFromCustomerDB.output1
     response = {

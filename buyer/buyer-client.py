@@ -1,7 +1,17 @@
+from ast import keyword
 import socket
 import threading
 import sys
 
+#from __future__ import print_function
+import requests
+import json
+import time
+import base64
+import jsonpickle
+import random
+import requests
+import json
 # Create an account: sets up username and password CMD 0000
 # Login: provide username and password CMD 0001
 # Logout CMD 0010

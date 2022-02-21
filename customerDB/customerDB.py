@@ -15,6 +15,7 @@ import customer_pb2_grpc
 sellerLogIn = {} #userName -> PSW
 sellerReview = {} #userName -> REVIEW[PosCOUNT_NegCOUNT]
 sellerItems = {} #userName -> ItemIds space separated
+sellerIDtoUserName = {}
 sellerIdGen = 1
 
 buyerLogIn = {} #userName -> PSW
@@ -38,6 +39,7 @@ def threadrunner(data):
         if userName in sellerLogIn.keys():
             return customer_pb2.outputMsg1(output1="Account is existing")
         sellerLogIn[userName] = data
+        sellerIDtoUserName[sellerIdGen-1] = userName
         sellerReview[userName] = '0_0'
         return customer_pb2.outputMsg1(output1="Account created with username : "+userName)
 
