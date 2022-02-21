@@ -45,7 +45,8 @@ def threadrunner(addr):
             #s.send('1111'.encode())
             break
         elif val == '0000':
-            inputstr = input(" enter username and password to Create Account")
+            headers = {'content-type': 'application/json'}
+            inputstr = input("enter username and password to Create Account \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -55,7 +56,8 @@ def threadrunner(addr):
             print(json.loads(response.text)['result'])
             print(response)
         elif val == '0001':
-            inputstr = input(" enter username and password to Log in")
+            headers = {'content-type': 'application/json'}
+            inputstr = input(" enter username and password to Log in \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -66,8 +68,9 @@ def threadrunner(addr):
             print(response)
             loggedIn = True
         elif val == '0010' and loggedIn==True:
+            headers = {'content-type': 'application/json'}
             url = addr + "/api/logOut"
-            inputstr = input(" enter username  to Log out")
+            inputstr = input(" enter username  to Log out \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -77,8 +80,9 @@ def threadrunner(addr):
             print(response)
             loggedIn = False
         elif val == '0011' and loggedIn==True:
+            headers = {'content-type': 'application/json'}
             url = addr + "/api/getSellerRating"
-            inputstr = input(" enter username  to get seller rating")
+            inputstr = input(" enter username  to get seller rating \n")
             values = {
                 'inputstr' : inputstr
             }
@@ -134,7 +138,7 @@ def threadrunner(addr):
             headers = {'content-type': 'application/json'}
             url = addr + "/api/display"
             #Display items currently on sale put up by this seller
-            seller_id = input("Enter username , seller id: ")
+            seller_id = input("Enter username: ")
             values = {
                 'inputstr' : seller_id
             }

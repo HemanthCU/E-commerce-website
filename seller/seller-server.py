@@ -65,7 +65,8 @@ def logIn():
     inputCmd = 'LOG_IN_S ' + json_data['inputstr']
     responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
     outputStr = responseFromCustomerDB.output1
-    if outputStr.split(' ',1) == 'LoggedIn':
+    login1, outputStr = outputStr.split(' ',1)
+    if login1 == 'LoggedIn':
         logedInBuyerList[outputStr] = 1
         response = {
             'result': 'Log in successful'
@@ -128,14 +129,15 @@ def put():
     r = request
     json_data = r.get_json()
     inputCmd = json_data['inputstr']
-    username = inputCmd.split(' ',1)
+    username, inputCmd = inputCmd.split(' ',1)
     outputStr = ''
     if username not in logedInBuyerList.keys():
         outputStr = 'please log in first'
     elif logedInBuyerList[username] != 1:
         outputStr = 'please log in first'
     else:
-        sellerId = username.split('_')[1]
+        unameSplit = username.split('_')
+        sellerId = unameSplit[1]
         itemId = sellerId+'_'+str(unique_item_id)
         cmd1 = 'PUT_ITEM_IN_S ' + username +' '+itemId
         responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = cmd1))
@@ -160,7 +162,7 @@ def change():
     global stub
     json_data = r.get_json()
     inputCmd = json_data['inputstr']
-    username = inputCmd.split(' ',1)
+    username, inputCmd = inputCmd.split(' ',1)
     outputStr = ''
     if username not in logedInBuyerList.keys():
         outputStr = 'please log in first'
@@ -194,15 +196,22 @@ def display():
         cmd1 = 'GET_ITEM_IN_S ' + username
         responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = cmd1))
         outputStr1 = responseFromCustomerDB.output1
-        itemList = outputStr1.split(' ')
-        resultItemList = ''
-        for iid in itemList:
-            responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = 'GET '+iid))
-            res = responseFromDB.output
-            print(res)
-            if not res.split(' ')[0] in ['GETFAILURE']:
-                resultItemList += res +'\n'
-        outputStr = resultItemList
+        if outputStr1 == 'NO_ITEM':
+            outputStr = 'Seller doesnt have any item in customer DB'
+        else:
+            itemList = outputStr1.split(' ')
+            resultItemList = ''
+            for iid in itemList:
+                responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = 'GET '+iid))
+                res = responseFromDB.output
+                print(res)
+                resSplit = res.split(' ')
+                if not resSplit[0] in ['GETFAILURE']:
+                    resultItemList += res +'\n'
+            if resultItemList == '':
+                outputStr = 'Nothing added to product DB'
+            else:
+                outputStr = resultItemList
     response = {
         'result': outputStr
     }
