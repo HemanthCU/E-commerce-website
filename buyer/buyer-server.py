@@ -67,7 +67,7 @@ def addItem():
     global stub
     global shoppingCart
     json_data = r.get_json()
-    itemDetails = json_data['inputstr']
+    itemDetails = json_data['inputstr'].split(' ')
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemDetails[0]))
     itemDBDetails = responseFromDB.output
     if itemDBDetails.split(' ')[0] in ['GETFAILURE']:
@@ -91,7 +91,7 @@ def removeItem():
     global stub
     global shoppingCart
     json_data = r.get_json()
-    itemDetails = json_data['inputstr']
+    itemDetails = json_data['inputstr'].split(' ')
     if itemDetails[0] in shoppingCart.keys():
         shoppingCart[itemDetails[0]] = str(int(shoppingCart[itemDetails[0]]) - int(itemDetails[1]))
         if int(shoppingCart[itemDetails[0]])<=0:
@@ -134,7 +134,7 @@ def clearCart():
     dummy = json_data['inputstr']
     shoppingCart.clear()
     response = {
-        'result': "Successfully done "
+        'result': "Successfully cleared cart"
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")

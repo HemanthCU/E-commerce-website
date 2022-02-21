@@ -18,14 +18,7 @@ import sys
 
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
-def threadrunner(host_ip, port):
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print ("Socket is successfully created")
-    except socket.error as err:
-        print ("Socket creation is failed with error %s" %(err))
-    s.connect((host_ip, port))
-    print("Buyer client is ready")
+def threadrunner(addr):
     while 1:
         print("MENU")
         print("0011 - Search based on keywords")
@@ -38,49 +31,65 @@ def threadrunner(host_ip, port):
         print("cmd "+val)
         if val== "exit":
             print("exiting")
-            s.send('1111'.encode())
+            #s.send('1111'.encode())
             break
         if val=='0011':
             #search item
-            keywords = input("Enter your item category and keywords with spaced for searching: ")
-            s.send((val + " "+keywords).encode())
+            inputstr = input("Enter your item category and keywords with spaced for searching: ")
+            values = {
+                'inputstr' : inputstr
+            }
+            url = addr + "/api/searchItems"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("fetching items for sale")
-            print (s.recv(1024).decode())#recv has to be a blocking call
+            print(json.loads(response.text)['result'])
+            print(response)
         if val=='0100':
             #Add item
-            ItemId_qautity = input("Enter item ID and quantity: ")
-            s.send((val+' '+ItemId_qautity).encode())
+            inputstr = input("Enter item ID and quantity: ")
+            values = {
+                'inputstr' : inputstr
+            }
+            url = addr + "/api/addItem"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("Checking whether success !!")
-            print (s.recv(1024).decode())#recv has to be a blocking call
+            print(json.loads(response.text)['result'])
+            print(response)
         if val=="0101":
             #remove item
-            ItemId_qautity = input("Enter item ID and quantity: ")
-            s.send((val+' '+ItemId_qautity).encode())
+            inputstr = input("Enter item ID and quantity: ")
+            values = {
+                'inputstr' : inputstr
+            }
+            url = addr + "/api/removeItem"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("Checking whether success !!")
-            print (s.recv(1024).decode())#recv has to be a blocking call
-        if val=="0110":
-            #clear cart
-            s.send((val + ' dummy').encode())
-            print("Checking whether success !!")
-            print (s.recv(1024).decode())#recv has to be a blocking call
+            print(json.loads(response.text)['result'])
+            print(response)
         if val=="0111":
             #display cart
-            s.send((val + ' dummy').encode())
-            print("Fetching !!")
-            print (s.recv(1024).decode())#recv has to be a blocking call
+            values = {
+                'inputstr' : 'dummy'
+            }
+            url = addr + "/api/displayCart"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success !!")
+            print(json.loads(response.text)['result'])
+            print(response)
+        if val=="0110":
+            #clear cart
+            values = {
+                'inputstr' : 'dummy'
+            }
+            url = addr + "/api/clearCart"
+            response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            print("Checking whether success !!")
+            print(json.loads(response.text)['result'])
+            print(response)
 
 port = 8808
-try:
-    host_ip = socket.gethostbyname('127.0.0.1')
-except socket.gaierror:
-    print ("there was an error resolving the host")
-    sys.exit()
-while 1:
-    val = input("Do you want to use buyer-client interface: ")
-    if val=='yes':   
-        threadrunner(host_ip,port)
-    elif val=='exit':
-        break
+host = '127.0.0.1'
 
+addr = f"http://{host}:8808"
 
-
+threadrunner(addr)
