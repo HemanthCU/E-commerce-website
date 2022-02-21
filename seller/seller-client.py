@@ -147,7 +147,7 @@ def threadrunner(addr):
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-        elif loggedIn==false:
+        elif loggedIn==False:
             print("Not logged in, please login and try again")
         else:
             print("Enter a valid option")

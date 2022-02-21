@@ -225,15 +225,15 @@ def remove():
     r = request
     global stub
     json_data = r.get_json()
-    imputCmd = json_data['inputstr']
-    username = imputCmd.split(' ')
+    inputCmd = json_data['inputstr']
+    username, inputCmd = inputCmd.split(' ', 1)
     outputStr = ''
     if username not in logedInBuyerList.keys():
         outputStr = 'please log in first'
     elif logedInBuyerList[username] != 1:
         outputStr = 'please log in first'
     else:
-        inputstr = 'REMOVE ' + imputCmd
+        inputstr = 'REMOVE ' + inputCmd
         responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
         outputStr = responseFromDB.output
     
