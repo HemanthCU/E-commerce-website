@@ -55,7 +55,7 @@ def threadrunner(data):
 
         elif cmd == 'ADD':
             iid, data = data.split(' ', 1)
-            sid, data = data.split(' ', 1)
+            sid = iid.split(' ')[0]
             if iid not in productdb.keys():
                 itemsellerDB[iid] = sid
                 productdb[iid] = data
