@@ -16,8 +16,8 @@ class customerApiStub(object):
         """
         self.sendCustomerDB = channel.unary_unary(
                 '/customerApi/sendCustomerDB',
-                request_serializer=customer__pb2.inputMsg.SerializeToString,
-                response_deserializer=customer__pb2.outputMsg.FromString,
+                request_serializer=customer__pb2.inputMsg1.SerializeToString,
+                response_deserializer=customer__pb2.outputMsg1.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_customerApiServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'sendCustomerDB': grpc.unary_unary_rpc_method_handler(
                     servicer.sendCustomerDB,
-                    request_deserializer=customer__pb2.inputMsg.FromString,
-                    response_serializer=customer__pb2.outputMsg.SerializeToString,
+                    request_deserializer=customer__pb2.inputMsg1.FromString,
+                    response_serializer=customer__pb2.outputMsg1.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class customerApi(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/customerApi/sendCustomerDB',
-            customer__pb2.inputMsg.SerializeToString,
-            customer__pb2.outputMsg.FromString,
+            customer__pb2.inputMsg1.SerializeToString,
+            customer__pb2.outputMsg1.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -26,7 +26,7 @@ import json
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 def threadrunner(addr):
-    loggedIn = false
+    loggedIn = False
     while 1:
         print("MENU")
         print("0000 - Create an account: sets up username and password")
@@ -64,8 +64,8 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-            loggedIn = true
-        elif val == '0010' and loggedIn==true:
+            loggedIn = True
+        elif val == '0010' and loggedIn==True:
             url = addr + "/api/logOut"
             inputstr = input(" enter username  to Log out")
             values = {
@@ -75,8 +75,8 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-            loggedIn = false
-        elif val == '0011' and loggedIn==true:
+            loggedIn = False
+        elif val == '0011' and loggedIn==True:
             url = addr + "/api/getSellerRating"
             inputstr = input(" enter username  to get seller rating")
             values = {
@@ -86,7 +86,7 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        elif val=='0100' and loggedIn==true:
+        elif val=='0100' and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/addItem"
             #Put an item for sale
@@ -103,7 +103,7 @@ def threadrunner(addr):
             print(json.loads(response.text)['result'])
             print(response)
             #print (s.recv(1024).decode())#recv has to be a blocking call
-        elif val=='0101' and loggedIn==true:
+        elif val=='0101' and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/changeSalesPrice"
             #Change the sale price of an item
@@ -118,7 +118,7 @@ def threadrunner(addr):
             print(response)
             
             #print (s.recv(1024).decode())#recv has to be a blocking call
-        elif val=="0110" and loggedIn==true:
+        elif val=="0110" and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/removeItem"
             #Remove an item from sale
@@ -130,7 +130,7 @@ def threadrunner(addr):
             print(json.loads(response.text)['result'])
             print(response)
             
-        elif val=="0111" and loggedIn==true:
+        elif val=="0111" and loggedIn==True:
             headers = {'content-type': 'application/json'}
             url = addr + "/api/display"
             #Display items currently on sale put up by this seller

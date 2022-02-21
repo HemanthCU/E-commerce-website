@@ -50,9 +50,9 @@ def createAccount():
     global stub1
     json_data = r.get_json()
     inputCmd = 'SIGN_IN_S ' + json_data['inputstr']
-    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg(input = inputCmd))
+    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
     response = {
-        'result': responseFromCustomerDB.output
+        'result': responseFromCustomerDB.output1
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
@@ -63,18 +63,18 @@ def logIn():
     global stub1
     json_data = r.get_json()
     inputCmd = 'LOG_IN_S ' + json_data['inputstr']
-    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg(input = inputCmd))
-    outputStr = responseFromCustomerDB.output
+    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
+    outputStr = responseFromCustomerDB.output1
     if outputStr.split(' ',1) == 'LoggedIn':
         logedInBuyerList[outputStr] = 1
         response = {
-        'result': 'Log in successful'
+            'result': 'Log in successful'
         }
         response_pickled = jsonpickle.encode(response)
         return Response(response=response_pickled, status=200, mimetype="application/json")
     else:
         response = {
-        'result': 'Log in unsuccessful'
+            'result': 'Log in unsuccessful'
         }
         response_pickled = jsonpickle.encode(response)
         return Response(response=response_pickled, status=200, mimetype="application/json")
@@ -107,8 +107,8 @@ def getSellerRating():
         outputStr = 'please log in first'
     else:
         inputCmd = 'GET_SELLER_REVIEW ' + username
-        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg(input = inputCmd))
-        outputStr = responseFromCustomerDB.output
+        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
+        outputStr = responseFromCustomerDB.output1
     
     response = {
         'result': outputStr
@@ -138,7 +138,7 @@ def put():
         sellerId = username.split('_')[1]
         itemId = sellerId+'_'+str(unique_item_id)
         cmd1 = 'PUT_ITEM_IN_S ' + username +' '+itemId
-        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg(input = cmd1))
+        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = cmd1))
         unique_item_id = unique_item_id + 1
         inputstr = 'ADD '+itemId+' '+inputCmd
         print(inputstr)
@@ -192,8 +192,8 @@ def display():
         outputStr = 'please log in first'
     else:
         cmd1 = 'GET_ITEM_IN_S ' + username
-        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg(input = cmd1))
-        outputStr1 = responseFromCustomerDB.output
+        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = cmd1))
+        outputStr1 = responseFromCustomerDB.output1
         itemList = outputStr1.split(' ')
         resultItemList = ''
         for iid in itemList:

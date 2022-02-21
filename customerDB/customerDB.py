@@ -30,48 +30,46 @@ def threadrunner(data):
     global buyerIdGen
     cmd = data.split(' ',1)
     
-    if cmd == 'SIGN_IN_S': #seller
+    if cmd == 'SIGN_IN_S': #seller create acc
         name = data.split(' ',1)
         userName = name +'_'+str(sellerIdGen)
         sellerIdGen += 1
         if userName in sellerLogIn.keys():
-            return customer_pb2.outputMsg(output="Account is exsisting")
-        else:    
+            return customer_pb2.outputMsg1(output1="Account is existing")
         sellerLogIn[userName] = data
         sellerReview[userName] = '0_0'
-        return customer_pb2.outputMsg(output="Account created with username : "+userName)
+        return customer_pb2.outputMsg1(output1="Account created with username : "+userName)
 
 
-    if cmd == 'SIGN_IN_B':#buyer
+    if cmd == 'SIGN_IN_B':#buyer create acc
         name = data.split(' ',1)
         userName = name +'_'+str(buyerIdGen)
         buyerIdGen += 1
         if userName in buyerLogIn.keys():
-            return customer_pb2.outputMsg(output="Account is exsisting")
-        else:    
+            return customer_pb2.outputMsg1(output1="Account is existing") 
         buyerLogIn[userName] = data
         buyerHistory[userName] = '0'
-        return customer_pb2.outputMsg(output="Account created with username : "+userName)
+        return customer_pb2.outputMsg1(output1="Account created with username : "+userName)
     
     if cmd == 'LOG_IN_B':#buyer
         userName = data.split(' ',1)
         if userName in buyerLogIn.keys():
             if data == buyerLogIn[userName]:
-                return customer_pb2.outputMsg(output="LoggedIn "+userName)
+                return customer_pb2.outputMsg1(output1="LoggedIn "+userName)
             else:
-                return customer_pb2.outputMsg(output="PSW wrong for : "+userName)
+                return customer_pb2.outputMsg1(output1="PSW wrong for : "+userName)
         else:
-            return customer_pb2.outputMsg(output="Account doesnot exist with username : "+userName)  
+            return customer_pb2.outputMsg1(output1="Account does not exist with username : "+userName)  
 
     if cmd == 'LOG_IN_S':#seller
         userName = data.split(' ',1)
         if userName in sellerLogIn.keys():
             if data == sellerLogIn[userName]:
-                return customer_pb2.outputMsg(output="LoggedIn "+userName)
+                return customer_pb2.outputMsg1(output1="LoggedIn "+userName)
             else:
-                return customer_pb2.outputMsg(output="PSW wrong for : "+userName)
+                return customer_pb2.outputMsg1(output1="PSW wrong for : "+userName)
         else:
-            return customer_pb2.outputMsg(output="Account doesnot exist with username : "+userName)
+            return customer_pb2.outputMsg1(output1="Account does not exist with username : "+userName)
 
     if cmd == 'PUT_ITEM_IN_S':#seller
         userName = data.split(' ',1)
@@ -79,7 +77,7 @@ def threadrunner(data):
             sellerItems[userName] = sellerItems[userName] +' '+data
         else:
             sellerItems[userName] = data 
-        return customer_pb2.outputMsg(output="Added item with username : "+userName)
+        return customer_pb2.outputMsg1(output1="Added item with username : "+userName)
 
     if cmd == 'GET_ITEM_IN_S':#seller
         userName = data.split(' ',1)
@@ -88,13 +86,13 @@ def threadrunner(data):
             outputStr = sellerItems[userName]
         else:
             outputStr = 'NO_ITEM'
-        return customer_pb2.outputMsg(output=outputStr)    
+        return customer_pb2.outputMsg1(output1=outputStr)    
 
     
     if cmd == 'UPDATE_SELLER_REVIEW':
         userName = data.split(' ',1)
         if userName not in sellerReview.keys():
-            return customer_pb2.outputMsg(output="No seller with username: "+userName)  
+            return customer_pb2.outputMsg1(output1="No seller with username: "+userName)  
         review = sellerReview[userName]
         pos, neg = review.split('_')
         pos = int(pos)
@@ -105,40 +103,40 @@ def threadrunner(data):
             neg += 1
         review = str(pos)+'_'+str(neg)
         sellerReview[userName] = review
-        return customer_pb2.outputMsg(output="Review Updated for seller: "+userName)  
+        return customer_pb2.outputMsg1(output1="Review Updated for seller: "+userName)  
 
     if cmd == 'GET_SELLER_REVIEW':
         userName = data        
         if userName not in sellerReview.keys():
-            return customer_pb2.outputMsg(output="No seller with username: "+userName)  
+            return customer_pb2.outputMsg1(output1="No seller with username: "+userName)  
         review = sellerReview[userName]
-        return customer_pb2.outputMsg(output=review)  
+        return customer_pb2.outputMsg1(output1=review)  
     
     if cmd == 'UPDATE_BUYER_HISTORY':
         userName = data.split(' ',1)
         if userName not in buyerHistory.keys():
-            return customer_pb2.outputMsg(output="No buyer with username: "+userName) 
+            return customer_pb2.outputMsg1(output1="No buyer with username: "+userName) 
         purchaseCount =  buyerHistory[userName]
         purchaseCount = int(purchaseCount) + int(data)
         buyerHistory[userName] = str(purchaseCount)
-        return customer_pb2.outputMsg(output="Purchase history update for buyer: "+userName)
+        return customer_pb2.outputMsg1(output1="Purchase history update for buyer: "+userName)
 
     if cmd == 'GET_BUYER_HISTORY':
         userName = data        
         if userName not in buyerHistory.keys():
-            return customer_pb2.outputMsg(output="No buyer with username: "+userName)  
+            return customer_pb2.outputMsg1(output1="No buyer with username: "+userName)  
         count = buyerHistory[userName]
-        return customer_pb2.outputMsg(output="Purchase history : "+count)
+        return customer_pb2.outputMsg1(output1="Purchase history : "+count)
     
-    return customer_pb2.outputMsg(output="No proper cmd found")
+    return customer_pb2.outputMsg1(output1="No proper cmd found")
 
                
 class customerApi(customer_pb2_grpc.customerApiServicer):
 
     def sendCustomerDB(self, request, context):
-        print(request.input)
-        return threadrunner(request.input)
-        #return customer_pb2.outputMsg(output="return to servers")
+        print(request.input1)
+        return threadrunner(request.input1)
+        #return customer_pb2.outputMsg1(output1="return to servers")
 
 
 if __name__ == '__main__':
