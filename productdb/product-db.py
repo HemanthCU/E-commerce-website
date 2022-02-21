@@ -127,7 +127,7 @@ def threadrunner(data):
                 return backend_pb2.outputMsg(output=retstr)
                 #clientsock.send(retstr.encode())
             else:
-                return backend_pb2.outputMsg(output="GETSIDFAILURE  -  seller does not exist")
+                return backend_pb2.outputMsg(output="GETSIDFAILURE")
         print(productdb)
         print(keywordDB)
         
