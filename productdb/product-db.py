@@ -16,6 +16,7 @@ import backend_pb2_grpc
 
 productdb = {}
 keywordDB = {}
+
 def threadrunner(data):
     global productdb
     global keywordDB
@@ -69,7 +70,8 @@ def threadrunner(data):
             else:
                 return backend_pb2.outputMsg(output="ADDFAILURE  - already exsisting item")
                 #clientsock.send("ADDFAILURE  - already exsisting item".encode())    
-            
+   
+
         elif cmd == 'UPDATE':
             iid, data = data.split(' ', 1)
             newprice = data

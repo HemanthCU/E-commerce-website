@@ -106,7 +106,7 @@ def put():
     global stub
     r = request
     json_data = r.get_json()
-    itemId = str(unique_seller_id)+str(unique_item_id)
+    itemId = str(unique_seller_id)+'_'+str(unique_item_id)
     if str(unique_seller_id) in sellerDB.keys():
         list1 = sellerDB[str(unique_seller_id)]
         list1.append(itemId)
