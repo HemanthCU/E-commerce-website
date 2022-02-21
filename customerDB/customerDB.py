@@ -107,6 +107,13 @@ def threadrunner(data):
        buyerHistory[userName] = str(purchaseCount)
        return customer_pb2.outputMsg(output="Purchase history update for buyer: "+userName)
 
+    if cmd == 'GET_BUYER_HISTORY':
+       userName = data        
+       if userName not in buyerHistory.keys():
+            return customer_pb2.outputMsg(output="No buyer with username: "+userName)  
+       count = buyerHistory[userName]
+       return customer_pb2.outputMsg(output="Purchase history : "+count)
+
 
 
 
