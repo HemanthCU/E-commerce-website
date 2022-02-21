@@ -26,7 +26,6 @@ import json
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 def threadrunner(addr):
-    loggedIn = false
     while 1:
         print("MENU")
         print("0000 - Create an account: sets up username and password")
@@ -54,7 +53,7 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        elif val == '0001':
+        if val == '0001':
             inputstr = input(" enter username and password to Log in")
             values = {
                 'inputstr' : inputstr
@@ -64,58 +63,63 @@ def threadrunner(addr):
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-            loggedIn = true
-        elif val == '0010' and loggedIn == true:
+        if val == '0010':
             url = addr + "/api/logOut"
+            inputstr = input(" enter username  to Log out")
             values = {
-                'inputstr' : 'logOut'
+                'inputstr' : inputstr
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-            loggedIn = false
-        elif val == '0011' and loggedIn == true:
+        if val == '0011':
             url = addr + "/api/getSellerRating"
+            inputstr = input(" enter username  to get seller rating")
             values = {
-                'inputstr' : 'getSellerRating'
+                'inputstr' : inputstr
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
-        elif val=='0100' and loggedIn == true:
+        if val=='0100':
             headers = {'content-type': 'application/json'}
             url = addr + "/api/addItem"
             #Put an item for sale
             #seller id, quantity
-            inputstr = input("Enter your Item name, category, condition, sale price, quantity and key words with space: ")
+            inputstr = input("Enter your username, Item name, category, condition, sale price, quantity and key words with space: ")
             values = {
                 'inputstr' : inputstr
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             
+            #s.send((val + " "+keywords).encode())
             print("Checking whether success")
             #dict_data = json.loads(response.get_json())
             print(json.loads(response.text)['result'])
             print(response)
-        elif val=='0101' and loggedIn == true:
+            #print (s.recv(1024).decode())#recv has to be a blocking call
+        if val=='0101':
             headers = {'content-type': 'application/json'}
             url = addr + "/api/changeSalesPrice"
             #Change the sale price of an item
-            ItemId_price = input("Enter item ID and new sale price: ")
+            ItemId_price = input("Enter username, item ID and new sale price: ")
             values = {
                 'inputstr' : ItemId_price
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            #s.send((val+' '+ItemId_price).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-        elif val=="0110" and loggedIn == true:
+            
+            #print (s.recv(1024).decode())#recv has to be a blocking call
+        if val=="0110":
             headers = {'content-type': 'application/json'}
             url = addr + "/api/removeItem"
             #Remove an item from sale
-            ItemId_quantity = input("Enter item ID and quantity: ")
+            ItemId_quantity = input("Enter username, item ID and quantity: ")
             values = {
                 'inputstr' : ItemId_quantity
             }
@@ -123,22 +127,20 @@ def threadrunner(addr):
             print(json.loads(response.text)['result'])
             print(response)
             
-        elif val=="0111" and loggedIn == true:
+        if val=="0111":
             headers = {'content-type': 'application/json'}
             url = addr + "/api/display"
             #Display items currently on sale put up by this seller
-            seller_id = input("Enter seller id: ")
+            seller_id = input("Enter username , seller id: ")
             values = {
                 'inputstr' : seller_id
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            #s.send((val+" "+seller_id).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
             print(response)
-        elif loggedIn==false:
-            print("Please log in and try again")
-        else:
-            print("Please enter a valid option")
+            
 
 port = 8807
 host = '127.0.0.1'
