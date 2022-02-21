@@ -11,7 +11,6 @@ import sys
 import grpc
 import requests
 import json
-import sys
 sys.path.append('../')
 import backend_pb2
 import backend_pb2_grpc
@@ -35,7 +34,7 @@ app = Flask(__name__)
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 unique_item_id = 1
-logedInBuyerList = {}
+loggedInSellerList = {}
 host1 = 'localhost:50054'
 channel = grpc.insecure_channel(host1)
 stub = backend_pb2_grpc.backendApiStub(channel)
@@ -67,7 +66,7 @@ def logIn():
     outputStr = responseFromCustomerDB.output1
     login1, outputStr = outputStr.split(' ',1)
     if login1 == 'LoggedIn':
-        logedInBuyerList[outputStr] = 1
+        loggedInSellerList[outputStr] = 1
         response = {
             'result': 'Log in successful'
         }
@@ -84,11 +83,10 @@ def logIn():
 @app.route('/api/logOut', methods=['POST'])
 def logOut():
     r = request
-    global stub
     json_data = r.get_json()
     inputCmd = json_data['inputstr']
-    if inputCmd in logedInBuyerList.keys():
-        logedInBuyerList[inputCmd] = 0
+    if inputCmd in loggedInSellerList.keys():
+        loggedInSellerList[inputCmd] = 0
     response = {
         'result': 'logged out'
     }
@@ -102,9 +100,9 @@ def getSellerRating():
     json_data = r.get_json()
     username = json_data['inputstr']
     outputStr = ''
-    if username not in logedInBuyerList.keys():
+    if username not in loggedInSellerList.keys():
         outputStr = 'please log in first'
-    elif logedInBuyerList[username] != 1:
+    elif loggedInSellerList[username] != 1:
         outputStr = 'please log in first'
     else:
         inputCmd = 'GET_SELLER_REVIEW ' + username
@@ -131,9 +129,9 @@ def put():
     inputCmd = json_data['inputstr']
     username, inputCmd = inputCmd.split(' ',1)
     outputStr = ''
-    if username not in logedInBuyerList.keys():
+    if username not in loggedInSellerList.keys():
         outputStr = 'please log in first'
-    elif logedInBuyerList[username] != 1:
+    elif loggedInSellerList[username] != 1:
         outputStr = 'please log in first'
     else:
         unameSplit = username.split('_')
@@ -142,7 +140,7 @@ def put():
         cmd1 = 'PUT_ITEM_IN_S ' + username +' '+itemId
         responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = cmd1))
         unique_item_id = unique_item_id + 1
-        inputstr = 'ADD '+itemId+' '+inputCmd
+        inputstr = 'ADD '+itemId+' '+username+' '+inputCmd
         print(inputstr)
         responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputstr))
         print(responseFromDB.output)
@@ -164,9 +162,9 @@ def change():
     inputCmd = json_data['inputstr']
     username, inputCmd = inputCmd.split(' ',1)
     outputStr = ''
-    if username not in logedInBuyerList.keys():
+    if username not in loggedInSellerList.keys():
         outputStr = 'please log in first'
-    elif logedInBuyerList[username] != 1:
+    elif loggedInSellerList[username] != 1:
         outputStr = 'please log in first'
     else:
         inputstr = 'UPDATE ' + inputCmd
@@ -188,9 +186,9 @@ def display():
     json_data = r.get_json()
     username = json_data['inputstr']
     outputStr = ''
-    if username not in logedInBuyerList.keys():
+    if username not in loggedInSellerList.keys():
         outputStr = 'please log in first'
-    elif logedInBuyerList[username] != 1:
+    elif loggedInSellerList[username] != 1:
         outputStr = 'please log in first'
     else:
         cmd1 = 'GET_ITEM_IN_S ' + username
@@ -228,9 +226,9 @@ def remove():
     inputCmd = json_data['inputstr']
     username, inputCmd = inputCmd.split(' ', 1)
     outputStr = ''
-    if username not in logedInBuyerList.keys():
+    if username not in loggedInSellerList.keys():
         outputStr = 'please log in first'
-    elif logedInBuyerList[username] != 1:
+    elif loggedInSellerList[username] != 1:
         outputStr = 'please log in first'
     else:
         inputstr = 'REMOVE ' + inputCmd

@@ -16,10 +16,12 @@ import backend_pb2_grpc
 
 productdb = {}
 keywordDB = {}
+itemsellerDB = {}
 
 def threadrunner(data):
     global productdb
     global keywordDB
+    global itemsellerDB
     #print(clientsock)
     #print(addr)
     while 1:
@@ -53,7 +55,9 @@ def threadrunner(data):
 
         elif cmd == 'ADD':
             iid, data = data.split(' ', 1)
+            sid, data = data.split(' ', 1)
             if iid not in productdb.keys():
+                itemsellerDB[iid] = sid
                 productdb[iid] = data
                 characteristics = data.split(' ')
                 i = 5
@@ -97,6 +101,7 @@ def threadrunner(data):
                 if newQuant<=0:
                     newQuant=0
                     poppeddata = productdb.pop(iid)
+                    itemsellerDB.pop(iid)
                     characteristics = poppeddata.split(' ')
                     i = 5
                     while i<len(characteristics):
@@ -116,6 +121,13 @@ def threadrunner(data):
             else:
                 return backend_pb2.outputMsg(output="REMOVEFAILURE  -  item does not exist")
                 #clientsock.send("REMOVEFAILURE  -  item does not exist".encode()) 
+        elif cmd in ['GETSID']:
+            if data in itemsellerDB.keys():
+                retstr = itemsellerDB[data]
+                return backend_pb2.outputMsg(output=retstr + ' dummy')
+                #clientsock.send(retstr.encode())
+            else:
+                return backend_pb2.outputMsg(output="GETSIDFAILURE  -  seller does not exist")
         print(productdb)
         print(keywordDB)
         

@@ -20,6 +20,7 @@ import sys
 
 def threadrunner(addr):
     loggedIn = False
+    purchaseFeedbackPending = False
     while 1:
         print("MENU")
         print("0000 - Create an account: sets up username and password")
@@ -50,7 +51,6 @@ def threadrunner(addr):
             }
             url = addr + "/api/createAccount"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
         elif val=='0001':
@@ -62,7 +62,6 @@ def threadrunner(addr):
             }
             url = addr + "/api/login"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
         elif val=='0010' and loggedIn==True:
@@ -74,7 +73,6 @@ def threadrunner(addr):
             }
             url = addr + "/api/logout"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
         elif val=='0011' and loggedIn==True:
@@ -92,7 +90,7 @@ def threadrunner(addr):
         elif val=='0100' and loggedIn==True:
             #Add item
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter item ID and quantity: ")
+            inputstr = input("Enter username, item ID and quantity: ")
             values = {
                 'inputstr' : inputstr
             }
@@ -104,7 +102,7 @@ def threadrunner(addr):
         elif val=="0101" and loggedIn==True:
             #remove item
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter item ID and quantity: ")
+            inputstr = input("Enter username, item ID and quantity: ")
             values = {
                 'inputstr' : inputstr
             }
@@ -116,8 +114,9 @@ def threadrunner(addr):
         elif val=="0111" and loggedIn==True:
             #display cart
             headers = {'content-type': 'application/json'}
+            inputstr = input("Enter username: ")
             values = {
-                'inputstr' : 'dummy'
+                'inputstr' : inputstr
             }
             url = addr + "/api/displayCart"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
@@ -127,8 +126,9 @@ def threadrunner(addr):
         elif val=="0110" and loggedIn==True:
             #clear cart
             headers = {'content-type': 'application/json'}
+            inputstr = input("Enter username: ")
             values = {
-                'inputstr' : 'dummy'
+                'inputstr' : inputstr
             }
             url = addr + "/api/clearCart"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
@@ -138,49 +138,48 @@ def threadrunner(addr):
         elif val=='1000' and loggedIn==True:
             #Make purchase
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter username and password to Create Account \n")
+            inputstr = input("Enter username and credit card details to make purchase \n")
             values = {
                 'inputstr' : inputstr
             }
             url = addr + "/api/makePurchase"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
-        elif val=='1001' and loggedIn==True:
+            purchaseFeedbackPending = True
+        elif val=='1001' and loggedIn==True and purchaseFeedbackPending==True:
             #Provide feedback
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter username and password to Create Account \n")
+            inputstr = input("Enter username, item id and feedback (P or N)\n")
             values = {
                 'inputstr' : inputstr
             }
             url = addr + "/api/provideFeedback"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
+        elif val=='1001' and loggedIn==True and purchaseFeedbackPending==False:
+            print("Please complete a purchase to provide feedback")
         elif val=='1010' and loggedIn==True:
             #Get Seller rating
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter username and password to Create Account \n")
+            inputstr = input("Enter username and seller id to get seller rating \n")
             values = {
                 'inputstr' : inputstr
             }
             url = addr + "/api/getSellerRating"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
         elif val=='1011' and loggedIn==True:
             #Get Buyer history
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter username and password to Create Account \n")
+            inputstr = input("Enter username to get buyer history \n")
             values = {
                 'inputstr' : inputstr
             }
             url = addr + "/api/getBuyerHistory"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print("fetching items for sale")
             print(json.loads(response.text)['result'])
             print(response)
         elif loggedIn==False:
