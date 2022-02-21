@@ -88,7 +88,8 @@ def threadrunner(addr):
             }
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print("Checking whether success")
-            print(json.loads(response.text)['result'])
+            reviewStr = json.loads(response.text)['result'].split('_')
+            print("positive review: "+reviewStr[0]+" negative feedback:  "+reviewStr[1])
             print(response)
         elif val=='0100' and loggedIn==True:
             headers = {'content-type': 'application/json'}

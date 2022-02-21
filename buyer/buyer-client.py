@@ -71,6 +71,7 @@ def threadrunner(addr):
                 'inputstr' : inputstr
             }
             url = addr + "/api/login"
+            loggedIn = True
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
             print(json.loads(response.text)['result'])
             print(response)
@@ -78,6 +79,7 @@ def threadrunner(addr):
             #Log out
             headers = {'content-type': 'application/json'}
             inputstr = input("Enter username to Log out \n")
+            loggedIn = False
             values = {
                 'inputstr' : inputstr
             }
@@ -166,14 +168,15 @@ def threadrunner(addr):
             }
             url = addr + "/api/provideFeedback"
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            print(json.loads(response.text)['result'])
+            reviewStr = json.loads(response.text)['result'].split('_')
+            print("positive review: "+reviewStr[0]+" negative feedback:  "+reviewStr[1])
             print(response)
         elif val=='1001' and loggedIn==True and purchaseFeedbackPending==False:
             print("Please complete a purchase to provide feedback")
         elif val=='1010' and loggedIn==True:
             #Get Seller rating
             headers = {'content-type': 'application/json'}
-            inputstr = input("Enter username and seller id to get seller rating \n")
+            inputstr = input("Enter username and item id to get seller rating \n")
             values = {
                 'inputstr' : inputstr
             }

@@ -48,7 +48,7 @@ shoppingCartDB = {}
 loggedInBuyerList = {}
 
 @app.route('/api/createAccount', methods=['POST'])
-def addItem():
+def createAccount():
     r = request
     global stub1
     json_data = r.get_json()
@@ -113,15 +113,16 @@ def searchItems():
         print(itemIDList)
         itemList = itemIDList.split(' ')
         for itemID in itemList:
-            itemDetails = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemID))
-            if not itemDetails.output.split(' ')[0] in ['GETFAILURE']:
+            resFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemID))
+            itemDetails = resFromDB.output
+            if not itemDetails.split(' ')[0] in ['GETFAILURE']:
                 print(itemDetails)
                 itemDetailstTuple = itemDetails.split(' ')
                 if itemDetailstTuple[2] in [category] and int(itemDetailstTuple[5])>0:
                     finalItems += itemDetailstTuple[0]+' '+itemDetailstTuple[1]+' '+itemDetailstTuple[2]+' '+itemDetailstTuple[3]+' '+itemDetailstTuple[4]+' '+itemDetailstTuple[5]+'\n'
         index += 1
     response = {
-        'result': responseFromDB.output
+        'result': finalItems
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
@@ -139,7 +140,7 @@ def addItem():
     itemDetails = inputstr.split(' ')
     responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GET "+itemDetails[0]))
     itemDBDetails = responseFromDB.output
-    item_quantity = itemDBDetails.split(' ')[1]
+    item_quantity = itemDBDetails.split(' ')[5]
     if itemDBDetails.split(' ')[0] in ['GETFAILURE']:
         respstr = "Item is not available currently"
     else:
@@ -270,9 +271,14 @@ def getSellerRating():
     json_data = r.get_json()
     inputstr = json_data['inputstr']
     username, inputstr = inputstr.split(' ',1)
-    inputCmd = 'GET_SELLER_REVIEW ' + inputstr
-    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
-    respstr = responseFromCustomerDB.output1
+    responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = "GETSID "+inputstr))
+    sellerUserName = responseFromDB.output
+    if sellerUserName in ['GETSIDFAILURE']:
+        respstr = "Seller does not exist"
+    else:     
+        inputCmd = 'GET_SELLER_REVIEW ' + sellerUserName
+        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
+        respstr = responseFromCustomerDB.output1
     response = {
         'result': respstr
     }
