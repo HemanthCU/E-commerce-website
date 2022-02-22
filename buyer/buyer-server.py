@@ -232,10 +232,20 @@ def makePurchase():
     
     #TODO: Connect to financial transaction module through SOAP/WSDL
     
-    #TODO: Decrease amount purchased from ProductDB
-    
-    #TODO: Add purchase to buyer history
-    
+    #Decrease amount purchased from ProductDB
+    shoppingCart = shoppingCartDB[username]
+    shoppingCartDB.pop(username)
+    itemcount = 0
+    for key in shoppingCart.keys():
+        if int(shoppingCart[key])>0:
+            inputCmd = 'REMOVE ' + key + ' ' + shoppingCart[key]
+            responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputCmd))
+            itemcount = itemcount + 1
+    #Update purchase to buyer history
+    inputCmd = 'UPDATE_BUYER_HISTORY ' + username + ' ' + str(itemcount)
+    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
+    respstr = responseFromCustomerDB.output1
+    print(respstr)
     response = {
         'result': "Successfully made purchase"
     }
