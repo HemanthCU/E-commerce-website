@@ -5,7 +5,7 @@ from flask import Flask, request, Response
 from socket import * 
 from unicodedata import category
 import jsonpickle
-
+from zeep import Client
 import io
 import threading
 import sys
@@ -230,8 +230,8 @@ def makePurchase():
     inputstr = json_data['inputstr']
     username, inputstr = inputstr.split(' ',1)
     creditCardDetails = inputstr
-    
-    purchance = random.randrange(1, 100)
+    client = Client(wsdl ='http://localhost:5005/wsdl?wsdl')
+    purchance = int(client.service.MessageSplitter(creditCardDetails,username))
     print(purchance)
     if purchance < 95:
         #Decrease amount purchased from ProductDB

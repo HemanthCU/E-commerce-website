@@ -35,7 +35,7 @@ def threadrunner(data):
         if cmd == 'GET':
             iid = data
             if iid in productdb.keys():
-                return backend_pb2.outputMsg(output=(iid + ' ' + productdb[iid]))
+                return backend_pb2.outputMsg(output=iid + ' ' + productdb[iid])
                 #clientsock.send((iid + ' ' + productdb[iid]).encode())
             else:
                 return backend_pb2.outputMsg(output="GETFAILURE  -  item does not exist")
