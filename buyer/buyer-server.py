@@ -12,6 +12,7 @@ import sys
 import grpc
 import requests
 import json
+import random
 sys.path.append('../')
 import backend_pb2
 import backend_pb2_grpc
@@ -230,24 +231,28 @@ def makePurchase():
     username, inputstr = inputstr.split(' ',1)
     creditCardDetails = inputstr
     
-    #TODO: Connect to financial transaction module through SOAP/WSDL
-    
-    #Decrease amount purchased from ProductDB
-    shoppingCart = shoppingCartDB[username]
-    shoppingCartDB.pop(username)
-    itemcount = 0
-    for key in shoppingCart.keys():
-        if int(shoppingCart[key])>0:
-            inputCmd = 'REMOVE ' + key + ' ' + shoppingCart[key]
-            responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputCmd))
-            itemcount = itemcount + 1
-    #Update purchase to buyer history
-    inputCmd = 'UPDATE_BUYER_HISTORY ' + username + ' ' + str(itemcount)
-    responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
-    respstr = responseFromCustomerDB.output1
-    print(respstr)
+    purchance = random.randrange(1, 100)
+    print(purchance)
+    if purchance < 95:
+        #Decrease amount purchased from ProductDB
+        shoppingCart = shoppingCartDB[username]
+        shoppingCartDB.pop(username)
+        itemcount = 0
+        for key in shoppingCart.keys():
+            if int(shoppingCart[key])>0:
+                inputCmd = 'REMOVE ' + key + ' ' + shoppingCart[key]
+                responseFromDB = stub.sendProductDB(backend_pb2.inputMsg(input = inputCmd))
+                itemcount = itemcount + 1
+        #Update purchase to buyer history
+        inputCmd = 'UPDATE_BUYER_HISTORY ' + username + ' ' + str(itemcount)
+        responseFromCustomerDB = stub1.sendCustomerDB(customer_pb2.inputMsg1(input1 = inputCmd))
+        respstr = responseFromCustomerDB.output1
+        print(respstr)
+        outstr = "Successfully made purchase"
+    else:
+        outstr = "Purchase failed. Please try again later"
     response = {
-        'result': "Successfully made purchase"
+        'result': outstr
     }
     response_pickled = jsonpickle.encode(response)
     return Response(response=response_pickled, status=200, mimetype="application/json")
