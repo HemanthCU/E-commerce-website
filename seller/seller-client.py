@@ -2,7 +2,7 @@ from ast import keyword
 import socket
 import threading
 import sys
-
+import time
 #from __future__ import print_function
 import requests
 import json
@@ -51,7 +51,10 @@ def threadrunner(addr):
                 'inputstr' : inputstr
             }
             url = addr + "/api/createAccount"
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
@@ -62,7 +65,10 @@ def threadrunner(addr):
                 'inputstr' : inputstr
             }
             url = addr + "/api/logIn"
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
@@ -74,7 +80,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : inputstr
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             print("Checking whether success")
             print(json.loads(response.text)['result'])
             print(response)
@@ -86,7 +95,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : inputstr
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             print("Checking whether success")
             reviewStr = json.loads(response.text)['result'].split('_')
             print("positive review: "+reviewStr[0]+" negative feedback:  "+reviewStr[1])
@@ -100,8 +112,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : inputstr
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
-            
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             #s.send((val + " "+keywords).encode())
             print("Checking whether success")
             #dict_data = json.loads(response.get_json())
@@ -116,7 +130,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : ItemId_price
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             #s.send((val+' '+ItemId_price).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
@@ -131,7 +148,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : ItemId_quantity
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             print(json.loads(response.text)['result'])
             print(response)
             
@@ -143,7 +163,10 @@ def threadrunner(addr):
             values = {
                 'inputstr' : seller_id
             }
+            start = time.perf_counter()
             response = requests.post(url, data=jsonpickle.encode(values), headers=headers)
+            delta = (time.perf_counter() - start)*1000
+            print("Took "+str(delta)+" ms per API call")
             #s.send((val+" "+seller_id).encode())
             print("Checking whether success !!")
             print(json.loads(response.text)['result'])
@@ -155,7 +178,7 @@ def threadrunner(addr):
             
 
 port = 8807
-if len(sys.argv) < 1:
+if len(sys.argv) < 2:
     print('please give ip of buyer-server')
 
 ip1 = sys.argv[1]

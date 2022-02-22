@@ -34,7 +34,7 @@ app = Flask(__name__)
 #CMD ARG1 ARG2 ARG3 ARG4 ARG5
 
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     print('please give ip of 2 db')
 
 ip1 = sys.argv[1]
