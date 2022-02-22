@@ -38,7 +38,7 @@ app.get('/', function (req, res) {
 })
 
 // Launch the server and listen
-var port = 5005;
+var port = 5006;
 app.listen(port, function () {
   console.log('Listening on port ' + port);
   var wsdl_path = "/wsdl";

@@ -230,8 +230,9 @@ def makePurchase():
     inputstr = json_data['inputstr']
     username, inputstr = inputstr.split(' ',1)
     creditCardDetails = inputstr
-    client = Client(wsdl ='http://localhost:5005/wsdl?wsdl')
-    purchance = int(client.service.MessageSplitter(creditCardDetails,username))
+    client = Client(wsdl ='http://localhost:5006/wsdl?wsdl')
+    wsdlRes = client.service.MessageSplitter(creditCardDetails,username)
+    purchance = int(wsdlRes[0])
     print(purchance)
     if purchance < 95:
         #Decrease amount purchased from ProductDB
