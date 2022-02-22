@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from flask import Flask, request, Response
-from PIL import Image
+
 from socket import * 
 import jsonpickle
-import base64
+
 import io
 import threading
 import sys
