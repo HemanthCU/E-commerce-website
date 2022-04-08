@@ -8,9 +8,16 @@ import sys
 sys.path.append('../')
 import customer_pb2
 import customer_pb2_grpc
+import pyuv
+import signal
 
-
-
+memberId = 0
+memberId = input('Enter memberId = ')
+noOfMems = 5
+GSeqNo = -1
+msgBuf = {}
+ip = ['0.0.0.0', '0.0.0.0', '0.0.0.0', '0.0.0.0', '0.0.0.0']
+port = [9000, 9001, 9002, 9003, 9004]
 
 sellerLogIn = {} #userName -> PSW
 sellerReview = {} #userName -> REVIEW[PosCOUNT_NegCOUNT]
@@ -37,10 +44,10 @@ def threadrunner(data):
         userName = name +'_'+str(sellerIdGen)
         sellerIdGen += 1
         if userName in sellerLogIn.keys():
-            return customer_pb2.outputMsg1(output1="Account is existing")
+            return "Account is existing"
         sellerLogIn[userName] = data
         sellerReview[userName] = '0_0'
-        return customer_pb2.outputMsg1(output1="Account created with username : "+userName)
+        return "Account created with username : "+userName
 
 
     elif cmd == 'SIGN_IN_B':#buyer create acc
@@ -48,30 +55,30 @@ def threadrunner(data):
         userName = name +'_'+str(buyerIdGen)
         buyerIdGen += 1
         if userName in buyerLogIn.keys():
-            return customer_pb2.outputMsg1(output1="Account is existing") 
+            return "Account is existing"
         buyerLogIn[userName] = data
         buyerHistory[userName] = '0'
-        return customer_pb2.outputMsg1(output1="Account created with username : "+userName)
+        return "Account created with username : "+userName
     
     elif cmd == 'LOG_IN_B':#buyer
         userName, data = data.split(' ',1)
         if userName in buyerLogIn.keys():
             if data == buyerLogIn[userName]:
-                return customer_pb2.outputMsg1(output1="LoggedIn "+userName)
+                return "LoggedIn "+userName
             else:
-                return customer_pb2.outputMsg1(output1="PSW wrong for : "+userName)
+                return "PSW wrong for : "+userName
         else:
-            return customer_pb2.outputMsg1(output1="Account does not exist with username : "+userName)  
+            return "Account does not exist with username : "+userName
 
     elif cmd == 'LOG_IN_S':#seller
         userName, data = data.split(' ',1)
         if userName in sellerLogIn.keys():
             if data == sellerLogIn[userName]:
-                return customer_pb2.outputMsg1(output1="LoggedIn "+userName)
+                return "LoggedIn "+userName
             else:
-                return customer_pb2.outputMsg1(output1="PSW wrong for : "+userName)
+                return "PSW wrong for : "+userName
         else:
-            return customer_pb2.outputMsg1(output1="Account does not exist with username : "+userName)
+            return "Account does not exist with username : "+userName
 
     elif cmd == 'PUT_ITEM_IN_S':#seller
         userName, data = data.split(' ',1)
@@ -79,7 +86,7 @@ def threadrunner(data):
             sellerItems[userName] = sellerItems[userName] +' '+data
         else:
             sellerItems[userName] = data 
-        return customer_pb2.outputMsg1(output1="Added item with username : "+userName)
+        return "Added item with username : "+userName
 
     elif cmd == 'GET_ITEM_IN_S':#seller
         userName = data
@@ -88,13 +95,13 @@ def threadrunner(data):
             outputStr = sellerItems[userName]
         else:
             outputStr = 'NO_ITEM'
-        return customer_pb2.outputMsg1(output1=outputStr)    
+        return outputStr
 
     
     elif cmd == 'UPDATE_SELLER_REVIEW':
         userName, data = data.split(' ',1)
         if userName not in sellerReview.keys():
-            return customer_pb2.outputMsg1(output1="No seller with username: "+userName)  
+            return "No seller with username: "+userName
         review = sellerReview[userName]
         pos, neg = review.split('_')
         pos = int(pos)
@@ -105,47 +112,106 @@ def threadrunner(data):
             neg += 1
         review = str(pos)+'_'+str(neg)
         sellerReview[userName] = review
-        return customer_pb2.outputMsg1(output1="Review Updated for seller: "+userName)  
+        return "Review Updated for seller: "+userName
 
     elif cmd == 'GET_SELLER_REVIEW':
         userName = data        
         if userName not in sellerReview.keys():
-            return customer_pb2.outputMsg1(output1="No seller with username: "+userName)  
+            return "No seller with username: "+userName
         review = sellerReview[userName]
-        return customer_pb2.outputMsg1(output1=review)  
+        return review
     
     elif cmd == 'UPDATE_BUYER_HISTORY':
         userName, data = data.split(' ',1)
         if userName not in buyerHistory.keys():
-            return customer_pb2.outputMsg1(output1="No buyer with username: "+userName) 
+            return "No buyer with username: "+userName
         purchaseCount =  buyerHistory[userName]
         purchaseCount = int(purchaseCount) + int(data)
         buyerHistory[userName] = str(purchaseCount)
-        return customer_pb2.outputMsg1(output1="Purchase history update for buyer: "+userName)
+        return "Purchase history update for buyer: "+userName
 
     elif cmd == 'GET_BUYER_HISTORY':
         userName = data        
         if userName not in buyerHistory.keys():
-            return customer_pb2.outputMsg1(output1="No buyer with username: "+userName)  
+            return "No buyer with username: "+userName
         count = buyerHistory[userName]
-        return customer_pb2.outputMsg1(output1="Purchase history : "+count)
+        return "Purchase history : "+count
     else:
-        return customer_pb2.outputMsg1(output1="No proper cmd found")
+        return "No proper cmd found"
 
-               
+def sendToAllReq(data):
+    msg = 'REQ ' + data
+    s = socket(AF_INET, SOCK_DGRAM, 0)
+    for i in range(5):
+        if i is not memberId:
+            s.sendto(msg.encode('utf-8'), (ip[i], port[i]))
+
+def sendToAllSeq(SeqNo, data):
+    msg = 'SEQ ' + str(SeqNo) + ' ' + data
+    s = socket(AF_INET, SOCK_DGRAM, 0)
+    for i in range(5):
+        if i is not memberId:
+            s.sendto(msg.encode('utf-8'), (ip[i], port[i]))
+
+def handleReqMsg(data):
+    #Handle request message
+    retstr = ""
+    if (GSeqNo+1) % noOfMems == memberId:
+        GSeqNo = GSeqNo + 1
+        sendToAllSeq(GSeqNo, data)
+        retstr = handleSeqMsg(str(GSeqNo) + ' ' + data)
+    return retstr
+
+def handleSeqMsg(data):
+    #Handle Sequence message
+    SeqNo, data = data.split(' ',1)
+    SeqNo = int(SeqNo)
+    msgBuf[SeqNo] = data
+    retstr = ""
+    if GSeqNo % noOfMems == memberId or GSeqNo + 1 == SeqNo:
+        GSeqNo = SeqNo
+        retstr = threadrunner(data)
+        while GSeqNo + 1 in msgBuf:
+            GSeqNo = GSeqNo + 1
+            threadrunner(msgBuf[GSeqNo])
+    return retstr
+
+def onRecvUDP(handle, ip_port, flags, data, error):
+    #Receive request message
+    if data is not None:
+        data = str(data)
+        cmd, data = data.split(' ',1)
+        if cmd == 'REQ':
+            handleReqMsg(data)
+        elif cmd == 'SEQ':
+            handleSeqMsg(data)
+
+
 class customerApi(customer_pb2_grpc.customerApiServicer):
 
     def sendCustomerDB(self, request, context):
         print(request.input1)
-        return threadrunner(request.input1)
+        # Send request message to all group members to determine who will sequence this message
+        sendToAllReq(request.input1)
+        # Receive sequencing message, check if sequence sender is self
+        retstr = handleReqMsg(request.input1)
+        # After sequencing message, add to buffer and perform action
+        # When action is performed, initial receiver of message returns to requester
+        #retstr = threadrunner(request.input1)
+        return customer_pb2.outputMsg1(output1=retstr)
         #return customer_pb2.outputMsg1(output1="return to servers")
 
 
 if __name__ == '__main__':
+    loop = pyuv.Loop.default_loop()
+    udpserver = pyuv.UDP(loop)
+    udpserver.bind((ip[memberId], port[memberId]))
+    udpserver.start_recv(onRecvUDP)
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     customer_pb2_grpc.add_customerApiServicer_to_server(customerApi(),server)
     server.add_insecure_port('[::]:50055')
     server.start()
-    server.wait_for_termination()
+    #server.wait_for_termination()
 
+    loop.run()
