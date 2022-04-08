@@ -17,6 +17,39 @@ import backend_pb2_grpc
 productdb = {}
 keywordDB = {}
 itemsellerDB = {}
+ipList= []
+raftDB_port = 8886
+
+try:
+    raftDB_socket = socket(AF_INET, SOCK_STREAM)
+    print ("Socket is successfully created")
+except error as err:
+    print ("Socket creation is failed with error %s" %(err))
+
+def connectRaftDB(dbName, cmd = '', arg = '',arg2 = ''):
+    for i in range(0,5):
+        try:
+          raftDB_socket.connect((ipList[i], raftDB_port))
+          if cmd =='getKeys':
+              raftDB_socket.send((dbName + " "+cmd).encode())
+              return raftDB_socket.recv(1024).decode().split(' ')
+          if cmd =='getValue':
+              raftDB_socket.send((dbName +" " +cmd+" "+arg).encode())
+              return raftDB_socket.recv(1024).decode()
+          if cmd == 'pop':
+              raftDB_socket.send((dbName +" " +cmd+" "+arg).encode())
+              return raftDB_socket.recv(1024).decode()
+          if cmd == "add":
+              raftDB_socket.send((dbName +" " +cmd+" "+arg+" "+arg2).encode())
+
+        except OSError as msg:
+          #raftDB_socket.close()
+          print("Raft sever "+str(i)+" ip "+str(ipList[i])+" is down")
+          continue
+    print(" All the raft db servers are down")
+
+        
+
 
 def threadrunner(data):
     global productdb
@@ -34,17 +67,37 @@ def threadrunner(data):
         
         if cmd == 'GET':
             iid = data
-            if iid in productdb.keys():
-                return backend_pb2.outputMsg(output=iid + ' ' + productdb[iid])
+            keys = connectRaftDB(dbName='productdb',cmd= 'getKeys')
+            chachedKeys = productdb.keys()
+            for i in range(len(keys)):
+                if keys[i] != chachedKeys[i]:
+                     chachedKeys = keys
+                     break
+            if iid in chachedKeys:
+                cachedVal = productdb[iid]
+                value =  connectRaftDB(dbName='productdb',cmd= 'getValue',arg=iid)
+                if value!=cachedVal:
+                    cachedVal = value
+                return backend_pb2.outputMsg(output=iid + ' ' + cachedVal)
                 #clientsock.send((iid + ' ' + productdb[iid]).encode())
             else:
                 return backend_pb2.outputMsg(output="GETFAILURE  -  item does not exist")
                 #clientsock.send("GETFAILURE  -  item does not exist".encode())     
 
         if cmd == 'GETIIDS':
-            if data in keywordDB.keys():
+            keys = connectRaftDB(dbName='keywordDB',cmd= 'getKeys')
+            chachedKeys = keywordDB.keys()
+            for i in range(len(keys)):
+                if keys[i] != chachedKeys[i]:
+                     chachedKeys = keys
+                     break
+            if data in chachedKeys:
                 retstr = ''
-                for item in keywordDB[data]:
+                cachedVal = keywordDB[data]
+                value =  connectRaftDB(dbName='keywordDB',cmd= 'getValue',arg=data)
+                if value!=cachedVal:
+                    cachedVal = value
+                for item in cachedVal:
                     retstr = retstr + str(item) + ' '
                 print(retstr)
                 return backend_pb2.outputMsg(output=retstr)
@@ -56,17 +109,34 @@ def threadrunner(data):
         elif cmd == 'ADD':
             iid, data = data.split(' ', 1)
             sellerUserName, data = data.split(' ', 1)
+
             if iid not in productdb.keys():
+                connectRaftDB(dbName='itemsellerDB',cmd= 'add',arg=iid,arg2=sellerUserName)
                 itemsellerDB[iid] = sellerUserName
+                connectRaftDB(dbName='productdb',cmd= 'add',arg=iid,arg2=data)
                 productdb[iid] = data
+                
                 characteristics = data.split(' ')
                 i = 5
                 while i<len(characteristics):
-                    if characteristics[i] in keywordDB.keys():
-                        list1 = keywordDB[characteristics[i]]
+                    keys = connectRaftDB(dbName='keywordDB',cmd= 'getKeys')
+                    chachedKeys = keywordDB.keys()
+                    for i in range(len(keys)):
+                       if keys[i] != chachedKeys[i]:
+                         chachedKeys = keys
+                         break
+                    if characteristics[i] in chachedKeys:
+                        cachedVal = keywordDB[characteristics[i]]
+                        value =  connectRaftDB(dbName='keywordDB',cmd= 'getValue',arg=characteristics[i])
+                        if value!=cachedVal:
+                           cachedVal = value
+                        list1 = cachedVal
                         list1.append(iid)
                         keywordDB[characteristics[i]] = list1
+                        str2 = ""
+                        connectRaftDB(dbName='keywordDB',cmd= 'add',arg=characteristics[i],arg2=str(str2.join(list1)))
                     else:
+                        connectRaftDB(dbName='keywordDB',cmd= 'add',arg=characteristics[i],arg2=iid)
                         keywordDB[characteristics[i]] = [iid]
                     i = i + 1
                 return backend_pb2.outputMsg(output="ADDSUCCESS")    
@@ -79,12 +149,23 @@ def threadrunner(data):
         elif cmd == 'UPDATE':
             iid, data = data.split(' ', 1)
             newprice = data
-            if iid in productdb.keys():
-                itemDetails = productdb[iid].split(' ')
+            keys = connectRaftDB(dbName='productdb',cmd= 'getKeys')
+            chachedKeys = productdb.keys()
+            for i in range(len(keys)):
+                if keys[i] != chachedKeys[i]:
+                    chachedKeys = keys
+                    break
+            if iid in chachedKeys:
+                cachedVal = productdb[iid]
+                value =  connectRaftDB(dbName='productdb',cmd= 'getValue',arg=iid)
+                if value!=cachedVal:
+                    cachedVal = value
+                itemDetails = cachedVal.split(' ')
                 itemDetails[3] = newprice
                 newDetails = ''
                 for details in itemDetails:
                     newDetails += details+' '
+                connectRaftDB(dbName='productdb',cmd= 'add',arg=iid,arg2=newDetails)    
                 productdb[iid] = newDetails
                 return backend_pb2.outputMsg(output="UPDATE SUCCESS ")
                 #clientsock.send("UPDATE SUCCESS ".encode()) 
@@ -95,26 +176,53 @@ def threadrunner(data):
         elif cmd in ['REMOVE']:
             iid, data = data.split(' ', 1)
             remquant = int(data)
-            if iid in productdb.keys():
-                itemDetails = productdb[iid].split(' ')
+            keys = connectRaftDB(dbName='productdb',cmd= 'getKeys')
+            chachedKeys = productdb.keys()
+            for i in range(len(keys)):
+                if keys[i] != chachedKeys[i]:
+                    chachedKeys = keys
+                    break
+            if iid in chachedKeys:
+                cachedVal = productdb[iid]
+                value =  connectRaftDB(dbName='productdb',cmd= 'getValue',arg=iid)
+                if value!=cachedVal:
+                    cachedVal = value
+                itemDetails = cachedVal.split(' ')
                 newQuant = int(itemDetails[4]) - remquant
                 if newQuant<=0:
                     newQuant=0
-                    poppeddata = productdb.pop(iid)
+                    poppeddata = connectRaftDB(dbName='productdb',cmd= 'pop',arg=iid)   
+                    poppeddataCached = productdb.pop(iid)
+                    if(poppeddata != poppeddataCached):
+                        poppeddataCached = poppeddata
+                    connectRaftDB(dbName='itemsellerDB',cmd= 'pop',arg=iid)   
                     itemsellerDB.pop(iid)
-                    characteristics = poppeddata.split(' ')
+                    characteristics = poppeddataCached.split(' ')
                     i = 5
                     while i<len(characteristics):
-                        if characteristics[i] in keywordDB.keys():
-                            list1 = keywordDB[characteristics[i]]
+                        keys = connectRaftDB(dbName='keywordDB',cmd= 'getKeys')
+                        chachedKeys = keywordDB.keys()
+                        for i in range(len(keys)):
+                            if keys[i] != chachedKeys[i]:
+                               chachedKeys = keys
+                               break
+                        if characteristics[i] in chachedKeys:
+                            cachedVal = keywordDB[characteristics[i]]
+                            value =  connectRaftDB(dbName='keywordDB',cmd= 'getValue',arg=characteristics[i]).split(' ')
+                            if value!=cachedVal:
+                                cachedVal = value
+                            list1 = cachedVal
                             list1.remove(iid)
                             keywordDB[characteristics[i]] = list1
+                            str2 = ""
+                            connectRaftDB(dbName='keywordDB',cmd= 'add',arg=characteristics[i],arg2=str(str2.join(list1)))
                         i = i + 1
                 else:
                     itemDetails[4] = str(int(itemDetails[4]) - remquant)
                     newDetails = ''
                     for details in itemDetails:
                         newDetails += details+' '
+                    connectRaftDB(dbName='productdb',cmd= 'add',arg=iid,arg2=newDetails)
                     productdb[iid] = newDetails
                 return backend_pb2.outputMsg(output="REMOVE SUCCESS ")
                 #clientsock.send("REMOVE SUCCESS ".encode()) 
@@ -122,8 +230,18 @@ def threadrunner(data):
                 return backend_pb2.outputMsg(output="REMOVEFAILURE  -  item does not exist")
                 #clientsock.send("REMOVEFAILURE  -  item does not exist".encode()) 
         elif cmd in ['GETSID']:
-            if data in itemsellerDB.keys():
-                retstr = itemsellerDB[data]
+            keys = connectRaftDB(dbName='itemsellerDB',cmd= 'getKeys')
+            chachedKeys = itemsellerDB.keys()
+            for i in range(len(keys)):
+                if keys[i] != chachedKeys[i]:
+                    chachedKeys = keys
+                    break
+            if data in chachedKeys:
+                cachedVal = itemsellerDB[data]
+                value =  connectRaftDB(dbName='itemsellerDB',cmd= 'getValue',arg=data)
+                if value!=cachedVal:
+                    cachedVal = value
+                retstr = cachedVal
                 return backend_pb2.outputMsg(output=retstr)
                 #clientsock.send(retstr.encode())
             else:
