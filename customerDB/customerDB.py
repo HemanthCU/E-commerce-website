@@ -172,12 +172,12 @@ def handleSeqMsg(data):
     SeqNo = int(SeqNo)
     msgBuf[SeqNo] = data
     retstr = ""
-    if GSeqNo % noOfMems == memberId or GSeqNo + 1 == SeqNo:
+    if (GSeqNo +1) % noOfMems == memberId or GSeqNo + 1 == SeqNo:
         GSeqNo = SeqNo
         retstr = threadrunner(data)
-        while GSeqNo + 1 in msgBuf:
+        #while GSeqNo + 1 in msgBuf:
             #GSeqNo = GSeqNo + 1
-            threadrunner(msgBuf[GSeqNo])
+        #    threadrunner(msgBuf[GSeqNo])
     return retstr
 
 def onRecvUDP(handle, ip_port, flags, data, error):

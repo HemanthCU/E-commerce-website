@@ -34,18 +34,19 @@ def connectRaftDB(dbName, cmd = '', arg = '',arg2 = ''):
       print ("Socket creation is failed with error %s" %(err))
     for i in range(0,5):
         try:
-          raftDB_socket.connect((ipList[i], raftDB_port))
+          ipPort=   ipList[i].split(':')
+          raftDB_socket.connect((ipPort[0], int(ipPort[1])))
           if cmd =='getKeys':
-              raftDB_socket.send((dbName + " "+cmd).encode())
+              raftDB_socket.send((dbName + ":"+cmd).encode())
               return raftDB_socket.recv(1024).decode().split(' ')
           if cmd =='getValue':
-              raftDB_socket.send((dbName +" " +cmd+" "+arg).encode())
+              raftDB_socket.send((dbName +":" +cmd+":"+arg).encode())
               return raftDB_socket.recv(1024).decode()
           if cmd == 'pop':
-              raftDB_socket.send((dbName +" " +cmd+" "+arg).encode())
+              raftDB_socket.send((dbName +":" +cmd+":"+arg).encode())
               return raftDB_socket.recv(1024).decode()
           if cmd == "add":
-              raftDB_socket.send((dbName +" " +cmd+" "+arg+" "+arg2).encode())
+              raftDB_socket.send((dbName +":" +cmd+":"+arg+":"+arg2).encode())
           raftDB_socket.close()
           return
 

@@ -1,5 +1,5 @@
 # The MIT License (MIT)
-
+#python3 raft-psync.py 127.0.0.1:9806  127.0.0.1:9806  127.0.0.1:9806  127.0.0.1:9806 127.0.0.1:9806
 # Copyright (c) 2016 Filipp Ozinov
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,33 +54,36 @@ def threadrunner(clientsock, addr):
     print('Waiting for raft-DB command')
     data = clientsock.recv(1024).decode()
     print(data)
-    cmds = data.split(' ')
+    cmds = data.split(':')
+    temp = cmds[0]
+    cmds[0] = cmds[1]
+    cmds[1] = temp
     if cmds[0] =='getKeys':
               if cmds[1] =='productdb':
                 str2 =''
-                return clientsock.send(str2.join(productdb.keys()))
+                return clientsock.send(str2.join(productdb.keys()).encode())
               if cmds[1] == 'keywordDB':
                 str2 =''
-                return clientsock.send(str2.join(keywordDB.keys()))
+                return clientsock.send(str2.join(keywordDB.keys()).encode())
               if cmds[1] == 'itemsellerDB':
                  str2 =''
-                 return clientsock.send(str2.join(itemsellerDB.keys()))
+                 return clientsock.send(str2.join(itemsellerDB.keys()).encode())
 
     if cmds[0] =='getValue':
               if cmds[1] =='productdb':
-                return clientsock.send(productdb.get(cmds[2]))
+                return clientsock.send(productdb.get(cmds[2]).encode())
               if cmds[1] == 'keywordDB':
-                return clientsock.send(keywordDB.get(cmds[2]))
+                return clientsock.send(keywordDB.get(cmds[2]).encode())
               if cmds[1] == 'itemsellerDB':
-                return clientsock.send(itemsellerDB.get(cmds[2]))
+                return clientsock.send(itemsellerDB.get(cmds[2]).encode())
                  
     if cmds[0] == 'pop':
               if cmds[1] =='productdb':
-                return clientsock.send(productdb.pop(cmds[2]))
+                return clientsock.send(productdb.pop(cmds[2]).encode())
               if cmds[1] == 'keywordDB':
-                return clientsock.send(keywordDB.pop(cmds[2]))
+                return clientsock.send(keywordDB.pop(cmds[2]).encode())
               if cmds[1] == 'itemsellerDB':
-                return clientsock.send(itemsellerDB.pop(cmds[2]))
+                return clientsock.send(itemsellerDB.pop(cmds[2]).encode())
     if cmds[0] == "add":
               if cmds[1] =='productdb':
                 productdb.set(cmds[2],cmds[3])  
