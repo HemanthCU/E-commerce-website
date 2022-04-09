@@ -160,7 +160,7 @@ def handleReqMsg(data):
     global GSeqNo
     retstr = ""
     if (GSeqNo+1) % noOfMems == memberId:
-        GSeqNo = GSeqNo + 1
+        #GSeqNo = GSeqNo + 1
         sendToAllSeq(GSeqNo, data)
         retstr = handleSeqMsg(str(GSeqNo) + ' ' + data)
     return retstr
@@ -176,7 +176,7 @@ def handleSeqMsg(data):
         GSeqNo = SeqNo
         retstr = threadrunner(data)
         while GSeqNo + 1 in msgBuf:
-            GSeqNo = GSeqNo + 1
+            #GSeqNo = GSeqNo + 1
             threadrunner(msgBuf[GSeqNo])
     return retstr
 
