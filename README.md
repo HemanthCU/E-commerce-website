@@ -5,17 +5,113 @@ Group Member Names:
 2) Hemanth Chenna
 
 Our system has the following components and they perform the functions as follows:
-1) Product DB - Maintains the details of all the items in an in-memory DB. Connected over GRPC to both the servers
-2) Seller Server - Acts as the intermediate between the seller and the DB. Connected over GRPC to both the DBs and over REST to the client
-3) Seller Client - UI for the seller to perform the necessary functions. Connected over REST to the server
-4) Buyer Server - Maintains the shopping cart for each buyer. Acts as the intermediate between the buyer and the DB. Connected over GRPC to both the DBs, over WSDL to the financial transaction service and over REST to the client
-5) Buyer Client - UI for the buyer to perform the necessary functions. Connected over REST to the server
-6) Customer DB - Maintains the list of sellers and the corresponding items those sellers are selling. Maintains the details of all the buyers and sellers along with their login details in an in-memory DB. Maintains review scores for all the sellers and buyer purchase history for all the buyers. Connected over GRPC to both the servers
+1) Product DB - Maintains the details of all the items in an in-memory DB. Connected over GRPC to all the servers. Uses Raft-based PySyncObject to achieve consensus with all the 5 product DBs.
+2) Seller Server - Acts as the stateless intermediate between the seller client and the DBs. Connected over GRPC to all the DB nodes and over REST to the clients
+3) Seller Client - UI for the seller to perform the necessary functions. Connected over REST to the servers
+4) Buyer Server - Acts as the intermediate between the buyer clients and the DBs. Connected over GRPC to all the DBs, over WSDL to the financial transaction service and over REST to the clients
+5) Buyer Client - UI for the buyer to perform the necessary functions. Connected over REST to the servers
+6) Customer DB - Maintains the list of sellers and the corresponding items those sellers are selling. Maintains the details of all the buyers and sellers along with their login details in an in-memory DB. Maintains review scores for all the sellers and buyer purchase history for all the buyers. Connected over GRPC to all the servers. Uses Rotating Sequencer Atomic Broadcast to achieve consensus with all the 5 customer DBs.
 7) Financial transaction service - Returns success of the transaction with 95% chance of success at random. Connected over WSDL/SOAP to Buyer server
 
 All servers, the Customer DB and the Product DB are multithreaded and can handle multiple requests at the same time.
 However, buffer is not persistent for all the servers and product DB
 
-The response times for the actions are as follows:
-1) Seller operations: Avg time is around 17.010 ms local and 14.234 ms for machines connected over GCP cloud
-2) Buyer operations: Avg time is around 14.931 ms local and 12.391 ms for machines connected over GCP cloud
+The avg response times for the actions are as follows:
+A) All replicas run normally (no failures)
+1) Seller operations:
+Create account - 35.23ms
+Login - 30.45ms
+Logout - 32.86ms
+Get Seller Rating - 34.92ms
+Put an item for sale - 42.53ms
+Remove item - 23.88ms
+Display items - 41.78ms
+
+2) Buyer operations: 
+Create account - 32.15ms
+Login - 29.87ms
+Logout - 27.35ms
+Search items - 25.14ms
+Add to cart - 23.00ms
+Remove from cart - 21.78ms
+Display cart - 22.36ms
+Clear cart - 24.12ms
+Make purchase - 40.15ms
+Provide feedback - 43.22ms
+Get Seller Rating - 39.86ms
+Get Buyer History - 33.32ms
+
+
+B) One server-side sellers interface replica and one server-side buyers interface to which some of the clients are connected fail
+1) Seller operations:
+Create account - 30.45ms
+Login - 31.55ms
+Logout - 34.76ms
+Get Seller Rating - 31.32ms
+Put an item for sale - 45.54ms
+Remove item - 21.89ms
+Display items - 45.65ms
+
+2) Buyer operations: 
+Create account - 29.15ms
+Login - 31.88ms
+Logout - 27.54ms
+Search items - 26.22ms
+Add to cart - 23.92ms
+Remove from cart - 24.58ms
+Display cart - 22.55ms
+Clear cart - 21.01ms
+Make purchase - 48.15ms
+Provide feedback - 46.27ms
+Get Seller Rating - 41.76ms
+Get Buyer History - 35.32ms
+
+
+C) One product database replica (not the leader) fails
+1) Seller operations:
+Create account - 
+Login - 
+Logout - 
+Get Seller Rating - 
+Put an item for sale -
+Remove item -
+Display items -
+
+2) Buyer operations: 
+Create account - 
+Login - 
+Logout - 
+Search items -
+Add to cart -
+Remove from cart - 
+Display cart - 
+Clear cart -
+Make purchase - 
+Provide feedback - 
+Get Seller Rating - 
+Get Buyer History - 
+
+
+D) Product database replica acting as leader fails
+1) Seller operations:
+Create account - 
+Login - 
+Logout - 
+Get Seller Rating - 
+Put an item for sale -
+Remove item -
+Display items -
+
+2) Buyer operations: 
+Create account - 
+Login - 
+Logout - 
+Search items -
+Add to cart -
+Remove from cart - 
+Display cart - 
+Clear cart -
+Make purchase - 
+Provide feedback - 
+Get Seller Rating - 
+Get Buyer History - 
