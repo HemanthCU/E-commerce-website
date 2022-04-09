@@ -236,12 +236,20 @@ def threadrunner(addr):
         else:
             print("Enter a valid option")
 port = 8808
-if len(sys.argv) < 1:
-    print('please give ip of buyer-server')
 
-ip1 = sys.argv[1]
-host = ip1
+ipList = []
+if len(sys.argv) < 5:
+       print('Please provide 5 IP:port of raft cluster')
+else:
+    for i in range(5):
+        ipList.append(sys.argv[i+1])
+
+#ip1 = sys.argv[1]
+#host = ip1
 #host = '127.0.0.1'
+index = random.randint(5)
+print(ipList[index])
+host = ipList[index]
 
 addr = f"http://{host}:8808"
 
