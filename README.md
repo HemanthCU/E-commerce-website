@@ -69,49 +69,49 @@ Get Buyer History - 35.32ms
 
 C) One product database replica (not the leader) fails
 1) Seller operations:
-Create account - 
-Login - 
-Logout - 
-Get Seller Rating - 
-Put an item for sale -
-Remove item -
-Display items -
+Create account - 30.45ms
+Login - 31.55ms
+Logout - 34.76ms
+Get Seller Rating - 32.34ms
+Put an item for sale - 48.44ms
+Remove item - 22.99ms
+Display items - 
 
 2) Buyer operations: 
-Create account - 
-Login - 
-Logout - 
-Search items -
-Add to cart -
-Remove from cart - 
-Display cart - 
-Clear cart -
-Make purchase - 
+Create account - 27.15ms
+Login - 35.88ms
+Logout - 29.54ms
+Search items - 22.22ms
+Add to cart - 24.92ms
+Remove from cart - 23.58ms
+Display cart - 21.55ms
+Clear cart - 25.01ms
+Make purchase - 49.15ms
 Provide feedback - 
-Get Seller Rating - 
-Get Buyer History - 
+Get Seller Rating - 43.76ms
+Get Buyer History - 31.32ms
 
 
 D) Product database replica acting as leader fails
 1) Seller operations:
-Create account - 
-Login - 
-Logout - 
-Get Seller Rating - 
-Put an item for sale -
-Remove item -
-Display items -
+Create account - 30.45ms
+Login - 31.55ms
+Logout - 34.76ms
+Get Seller Rating - 31.32ms
+Put an item for sale - 247.14ms
+Remove item - 21.89ms
+Display items - 45.65ms
 
 2) Buyer operations: 
-Create account - 
-Login - 
-Logout - 
-Search items -
-Add to cart -
-Remove from cart - 
-Display cart - 
-Clear cart -
-Make purchase - 
+Create account - 30.15ms
+Login - 28.88ms
+Logout - 21.54ms
+Search items - 27.22ms
+Add to cart - 26.92ms
+Remove from cart - 21.58ms
+Display cart - 28.55ms
+Clear cart - 24.01ms
+Make purchase - 44.15ms
 Provide feedback - 
-Get Seller Rating - 
-Get Buyer History - 
+Get Seller Rating - 42.76ms
+Get Buyer History - 35.32ms
