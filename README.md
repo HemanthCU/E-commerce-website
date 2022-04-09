@@ -16,6 +16,8 @@ Our system has the following components and they perform the functions as follow
 All servers, the Customer DB and the Product DB are multithreaded and can handle multiple requests at the same time.
 However, buffer is not persistent for all the servers and product DB
 
+Currently, Rotating Sequencer works for some cases and Raft works for some cases but they are not reliably working. Some edge cases have to be handled properly still. Many of the performance numbers are based on individual separated runs of parts of the code and not as a system as a whole as it is not robust enough to handle all the edge cases.
+
 The avg response times for the actions are as follows:
 A) All replicas run normally (no failures)
 1) Seller operations:
