@@ -13,7 +13,6 @@ import signal
 
 memberId = 0
 memberId = input('Enter memberId = ')
-memberId = int(memberId)
 noOfMems = 5
 GSeqNo = -1
 msgBuf = {}
@@ -37,7 +36,6 @@ def threadrunner(data):
     global buyerHistory
     global sellerIdGen
     global buyerIdGen
-    
     print('here1 ' + data)
     cmd, data = data.split(' ',1)
     print(cmd)
@@ -157,32 +155,33 @@ def sendToAllSeq(SeqNo, data):
 
 def handleReqMsg(data):
     #Handle request message
-    global GSeqNo
     retstr = ""
     if (GSeqNo+1) % noOfMems == memberId:
-        #GSeqNo = GSeqNo + 1
+        GSeqNo = GSeqNo + 1
         sendToAllSeq(GSeqNo, data)
         retstr = handleSeqMsg(str(GSeqNo) + ' ' + data)
     return retstr
 
 def handleSeqMsg(data):
     #Handle Sequence message
-    global GSeqNo
     SeqNo, data = data.split(' ',1)
     SeqNo = int(SeqNo)
     msgBuf[SeqNo] = data
     retstr = ""
-    if (GSeqNo +1) % noOfMems == memberId or GSeqNo + 1 == SeqNo:
+    if GSeqNo % noOfMems == memberId or GSeqNo + 1 == SeqNo:
         GSeqNo = SeqNo
         retstr = threadrunner(data)
-        #while GSeqNo + 1 in msgBuf:
-            #GSeqNo = GSeqNo + 1
-        #    threadrunner(msgBuf[GSeqNo])
+        while GSeqNo + 1 in msgBuf:
+            GSeqNo = GSeqNo + 1
+            threadrunner(msgBuf[GSeqNo])
+    elif GSeqNo + 1 < SeqNo:
+        msg = 'RET ' + str(GSeqNo + 1)
+        s = socket(AF_INET, SOCK_DGRAM, 0)
+        s.sendto(msg.encode('utf-8'), (ip[(GSeqNo + 1) % noOfMems], port[(GSeqNo + 1) % noOfMems]))
     return retstr
 
 def onRecvUDP(handle, ip_port, flags, data, error):
     #Receive request message
-    global GSeqNo
     if data is not None:
         data = str(data)
         cmd, data = data.split(' ',1)
@@ -190,6 +189,12 @@ def onRecvUDP(handle, ip_port, flags, data, error):
             handleReqMsg(data)
         elif cmd == 'SEQ':
             handleSeqMsg(data)
+        elif cmd == 'RET':
+            s = socket(AF_INET, SOCK_DGRAM, 0)
+            SeqNo = int(data)
+            if SeqNo in msgBuf:
+                msg = 'SEQ ' + str(SeqNo) + ' ' + msgBuf[SeqNo]
+                s.sendto(msg.encode('utf-8'), ip_port)
 
 
 class customerApi(customer_pb2_grpc.customerApiServicer):
@@ -208,11 +213,9 @@ class customerApi(customer_pb2_grpc.customerApiServicer):
 
 
 if __name__ == '__main__':
-    #global ip
-    #global port
     loop = pyuv.Loop.default_loop()
     udpserver = pyuv.UDP(loop)
-    udpserver.bind((ip[memberId], port[memberId]))
+    udpserver.bind((ip[int(memberId)], port[int(memberId)]))
     udpserver.start_recv(onRecvUDP)
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
