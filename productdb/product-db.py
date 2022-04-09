@@ -27,6 +27,11 @@ except error as err:
     print ("Socket creation is failed with error %s" %(err))
 
 def connectRaftDB(dbName, cmd = '', arg = '',arg2 = ''):
+    try:
+      raftDB_socket = socket(AF_INET, SOCK_STREAM)
+      print ("Socket is successfully created")
+    except error as err:
+      print ("Socket creation is failed with error %s" %(err))
     for i in range(0,5):
         try:
           raftDB_socket.connect((ipList[i], raftDB_port))
@@ -41,12 +46,16 @@ def connectRaftDB(dbName, cmd = '', arg = '',arg2 = ''):
               return raftDB_socket.recv(1024).decode()
           if cmd == "add":
               raftDB_socket.send((dbName +" " +cmd+" "+arg+" "+arg2).encode())
+          raftDB_socket.close()
+          return
 
         except OSError as msg:
           #raftDB_socket.close()
           print("Raft sever "+str(i)+" ip "+str(ipList[i])+" is down")
           continue
+    
     print(" All the raft db servers are down")
+
 
         
 
@@ -263,6 +272,12 @@ if __name__ == '__main__':
     #tcpsocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     #tcpsocket.bind((SERVERHOST, SERVERPORT))
     #tcpsocket.listen(5)
+    if len(sys.argv) < 5:
+       print('Please provide 5 IP:port of raft cluster')
+    else:
+       for i in range(5):
+           ipList.append(sys.argv[i+1])
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     backend_pb2_grpc.add_backendApiServicer_to_server(backendApi(),server)
     server.add_insecure_port('[::]:50054')

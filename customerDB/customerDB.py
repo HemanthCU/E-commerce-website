@@ -13,6 +13,7 @@ import signal
 
 memberId = 0
 memberId = input('Enter memberId = ')
+memberId = int(memberId)
 noOfMems = 5
 GSeqNo = -1
 msgBuf = {}
@@ -36,6 +37,7 @@ def threadrunner(data):
     global buyerHistory
     global sellerIdGen
     global buyerIdGen
+    
     print('here1 ' + data)
     cmd, data = data.split(' ',1)
     print(cmd)
@@ -155,6 +157,7 @@ def sendToAllSeq(SeqNo, data):
 
 def handleReqMsg(data):
     #Handle request message
+    global GSeqNo
     retstr = ""
     if (GSeqNo+1) % noOfMems == memberId:
         GSeqNo = GSeqNo + 1
@@ -164,6 +167,7 @@ def handleReqMsg(data):
 
 def handleSeqMsg(data):
     #Handle Sequence message
+    global GSeqNo
     SeqNo, data = data.split(' ',1)
     SeqNo = int(SeqNo)
     msgBuf[SeqNo] = data
@@ -178,6 +182,7 @@ def handleSeqMsg(data):
 
 def onRecvUDP(handle, ip_port, flags, data, error):
     #Receive request message
+    global GSeqNo
     if data is not None:
         data = str(data)
         cmd, data = data.split(' ',1)
@@ -203,6 +208,8 @@ class customerApi(customer_pb2_grpc.customerApiServicer):
 
 
 if __name__ == '__main__':
+    #global ip
+    #global port
     loop = pyuv.Loop.default_loop()
     udpserver = pyuv.UDP(loop)
     udpserver.bind((ip[memberId], port[memberId]))
