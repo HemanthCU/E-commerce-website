@@ -190,7 +190,7 @@ else:
 #ip1 = sys.argv[1]
 #host = ip1
 #host = '127.0.0.1'
-index = random.randint(5)
+index = random.randint(0,4)
 print(ipList[index])
 host = ipList[index]
 addr = f"http://{host}:8807"
