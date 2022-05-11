@@ -1,8 +1,8 @@
 # Distributed Systems Programming Assignments - E-commerce Website
 
 Group Member Names:
-1) Soumyadeb Maity
-2) Hemanth Chenna
+1)  Soumyadeb Maity
+2)  Hemanth Chenna
 
 Our system has the following components and they perform the functions as follows:
 1) Product DB - Maintains the details of all the items in an in-memory DB. Connected over GRPC to all the servers. Uses Raft-based PySyncObject to achieve consensus with all the 5 product DBs.
